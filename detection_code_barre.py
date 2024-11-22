@@ -54,13 +54,18 @@ Txx=signal.convolve2d(I_x*I_x,gauss2D,mode='same', boundary='fill', fillvalue=0)
 Tyy=signal.convolve2d(I_y*I_y,gauss2D,mode='same', boundary='fill', fillvalue=0)
 Txy=signal.convolve2d(I_x*I_y,gauss2D,mode='same', boundary='fill', fillvalue=0)
 
-# Mesure de coherence
 
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Mesure de coherence ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+# méthode avec les valeurs propres possibles seulement si la matrice est crrée
 T=np.block([[Txx,Txy],[Txy,Tyy]])
 # dt=np.linalg.det(T)
-U, S, Vt = np.linalg.svd(T)
+# U, S, Vt = np.linalg.svd(T)
 
+D = lambda X,Y: np.sqrt((X-Y)**2+4*X**2)/(X+Y)
+D_res=D(Txx,Txy)
 
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Mesure de coherence ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
 plt.figure(1)
 plt.subplot(1, 2, 1)
 plt.imshow(img_code_barre)
