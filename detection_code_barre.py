@@ -14,9 +14,6 @@ Y_code_barre=img_code_barre_YCbCr[:,:,0]
 Cb_code_barre=img_code_barre_YCbCr[:,:,1]
 Cr_code_barre=img_code_barre_YCbCr[:,:,2]
 
-
-
-
 #filtre
 def G_2D(n,sigma):
     x=range(-n,n)
@@ -44,6 +41,13 @@ X, Y = np.meshgrid(y, x)
 
 I_x=signal.convolve2d(Y_code_barre,gauss_x_prime,mode='same', boundary='fill', fillvalue=0)
 I_y=signal.convolve2d(Y_code_barre,gauss_y_prime,mode='same', boundary='fill', fillvalue=0)
+
+norm_I_x=np.linalg.norm(I_x,ord=2)
+norm_I_y=np.linalg.norm(I_y,ord=2)
+
+In_x=I_x/norm_I_x
+In_y=I_y/norm_I_y
+
 #tenseur de structure local
 
 Txx=signal.convolve2d(I_x*I_x,gauss2D,mode='same', boundary='fill', fillvalue=0)
@@ -63,10 +67,10 @@ plt.title("img canal Y")
 plt.figure(2)
 plt.subplot(1, 2, 1)
 plt.imshow(I_x,cmap='gray')
-plt.title("grad x")
+plt.title("I_x")
 plt.subplot(1, 2, 2)
 plt.imshow(I_y,cmap='gray')
-plt.title("grad y")
+plt.title("I_y")
 
 plt.figure(3)
 plt.subplot(1, 3, 1)
@@ -78,6 +82,15 @@ plt.title("Tyy")
 plt.subplot(1, 3, 3)
 plt.imshow(Txy,cmap='gray')
 plt.title("Txy")
+
+plt.figure(4)
+plt.subplot(1, 2, 1)
+plt.imshow(In_x,cmap='gray')
+plt.title("I_x normalisée")
+plt.subplot(1, 2, 2)
+plt.imshow(In_y,cmap='gray')
+plt.title("I_y normalisée")
+
 
 
 plt.show()
