@@ -14,29 +14,43 @@ Y_code_barre=img_code_barre_YCbCr[:,:,0]
 Cb_code_barre=img_code_barre_YCbCr[:,:,1]
 Cr_code_barre=img_code_barre_YCbCr[:,:,2]
 
+
+
+
+#filtre
+def G_2D(n,sigma):
+    x=range(-n,n)
+    X,Y=np.meshgrid(x,x)
+    return np.exp(-1/2*(X**2/(sigma**2)+(Y**2/sigma**2)))
+
+def G_x_prime(n,sigma): #derive d'une gaussienne
+    P = range(-n,n)
+    X, Y = np.meshgrid(P,P)
+    return (-X/(2*np.pi*sigma**2)*np.exp(-(X**2+Y**2)/(2*sigma**2)))
+
+def G_y_prime(n,sigma): #derive d'une gaussienne
+    P = range(-n,n)
+    X, Y = np.meshgrid(P,P)
+    return (-Y/(2*np.pi*sigma**2)*np.exp(-(X**2+Y**2)/(2*sigma**2)))
+
+gauss2D=G_2D(2,1)
+gauss_x_prime=G_x_prime(10,1)
+gauss_y_prime=G_y_prime(10,1)
 #gradient
 h,w,c=np.shape(img_code_barre_YCbCr)
 x = np.linspace(0, h, h)
 y = np.linspace(0, w, w)
 X, Y = np.meshgrid(y, x)
 
-I_x,I_y=np.gradient(Y_code_barre,x,y)
-#filtre
-def G_2D(n,sigma):
-    x=range(-n,n)
-    y=range(-n,n)
-    X,Y=np.meshgrid(x,y)
-    return np.exp(-1/2*(X**2/(sigma**2)+(Y**2/sigma**2)))
-
-def G_prime(x,y,sigma): #derive d'une gaussienne
-    return (-x/(2*np.pi*sigma**2)*np.exp(-(x**2+y**2)/(2*sigma**2)))
-
-gauss2D=G_2D(2,1)
+I_x=signal.convolve2d(Y_code_barre,gauss_x_prime,mode='same', boundary='fill', fillvalue=0)
+I_y=signal.convolve2d(Y_code_barre,gauss_y_prime,mode='same', boundary='fill', fillvalue=0)
+#tenseur de structure local
 
 Txx=signal.convolve2d(I_x*I_x,gauss2D,mode='same', boundary='fill', fillvalue=0)
 Tyy=signal.convolve2d(I_y*I_y,gauss2D,mode='same', boundary='fill', fillvalue=0)
 Txy=signal.convolve2d(I_x*I_y,gauss2D,mode='same', boundary='fill', fillvalue=0)
 
+# Mesure de coherence
 
 plt.figure(1)
 plt.subplot(1, 2, 1)
