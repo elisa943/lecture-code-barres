@@ -101,6 +101,12 @@ plt.subplot(1, 2, 2)
 plt.imshow(In_y,cmap='gray')
 plt.title("I_y normalisée")
 
+plt.figure(5)
+plt.subplot(1, 2, 1)
+plt.imshow(D_res,cmap='gray')
+plt.title("Mesure de coherence")
+
+
 
 
 plt.show()
