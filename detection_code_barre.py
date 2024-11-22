@@ -38,6 +38,11 @@ Tyy=signal.convolve2d(I_y*I_y,gauss2D,mode='same', boundary='fill', fillvalue=0)
 Txy=signal.convolve2d(I_x*I_y,gauss2D,mode='same', boundary='fill', fillvalue=0)
 
 
+T=np.block([[Txx,Txy],[Txy,Tyy]])
+# dt=np.linalg.det(T)
+U, S, Vt = np.linalg.svd(T)
+
+
 plt.figure(1)
 plt.subplot(1, 2, 1)
 plt.imshow(img_code_barre)
