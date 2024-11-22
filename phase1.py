@@ -1,5 +1,9 @@
 import numpy as np
 
+def distance(x1,y1,x2,y2):
+    """ Calcule la distance entre deux points """
+    return np.sqrt((x2-x1)**2+(y2-y1)**2)
+
 def echantillonnage(x1,y1,x2,y2,Nb_points):
     """On échantillone sur le segment (x1,y1)->(x2,y2)"""
     """On va choisir le plus proche voisin"""
@@ -9,7 +13,7 @@ def echantillonnage(x1,y1,x2,y2,Nb_points):
 
 def find_lim(x1,y1,x2,y2,img,seuil):
     """Récupération des points de départ et d'arrivée pour le segment 2"""
-    X,Y=echantillonnage(x1,y1,x2,y2,np.ceil(np.sqrt((x2-x1)**2+(y2-y1)**2)).astype(int))
+    X,Y=echantillonnage(x1,y1,x2,y2,np.ceil(distance(x1, y1, x2, y2)).astype(int))
     L=img[X,Y]>=seuil #Binarisation
     i1=0
     i2=0
@@ -25,7 +29,7 @@ def find_lim(x1,y1,x2,y2,img,seuil):
 
 def find_u(xd,yd,xa,ya,img,seuil):
     """On va prendre le multiple u et le signal binaire à analyser"""
-    nb_p=np.ceil(np.sqrt((xa-xd)**2-(ya-yd)**2))
+    nb_p=np.ceil(distance(xd,yd,xa,ya))
     Nb_points=0
     u=0
     while (Nb_points<nb_p):
@@ -38,6 +42,6 @@ x1=2
 x2=5
 y1=9
 y2=6
-Nb=np.ceil(np.sqrt((x2-x1)**2+(y2-y1)**2)).astype(int)
+Nb=np.ceil(distance(x1, y1, x2, y2)).astype(int)
 X,Y=echantillonnage(x1,y1,x2,y2,Nb)
 print(X,Y)
