@@ -37,6 +37,14 @@ def find_u(xd,yd,xa,ya,img,seuil):
         u+=1
     return img[echantillonnage(xd,yd,xa,ya,Nb_points)]>=seuil,u #Echantillonnage et binarisation
 
+def separate(l_bin,u):
+    L=np.zeros(12,u*7)
+    start=3*u
+    for i in range(0,12):
+        if (i==6):
+            start=start+5*u
+        L[i,:]=l_bin[start+i*7*u:start+(i+1)*7*u]
+    return L
 
 x1=2
 x2=5
