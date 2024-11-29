@@ -120,20 +120,21 @@ def separate(l_bin,u):
 
 def compare(L_exp,L_the,u):
     min=len(L_exp[0])
-    decode=np.zeros((1,12))
+    decode=np.zeros((12, 1))
     r="000000"
-    for i in range(0,len(L_exp)/2):
+    for i in range(0,len(L_exp)//2):
         for j in range(0,len(L_the[0])):
             if (min>sum(L_exp[i]!=("{0:b}".format(L_the[0][j]).zfill(7))*u)):
                 min=sum(L_exp[i]!=("{0:b}".format(L_the[0][j]).zfill(7))*u)
-                decode[i]=L_the[0,j]
+                decode[i]=L_the[0][j]
                 r[i]='A'
             if (min>sum(L_exp[i]!=("{0:b}".format(L_the[1][j]).zfill(7))*u)):
                 min=sum(L_exp[i]!=("{0:b}".format(L_the[1][j]).zfill(7))*u)
                 decode[i]=L_the[1,j]
                 r[i]='B'
         min=len(L_exp[0])
-    for i in range(len(L_exp)/2,len(L_exp)):
+
+    for i in range(len(L_exp)//2,len(L_exp)):
         for j in range(0,len(L_the[0])):
             if (min>sum(L_exp[i]!=("{0:b}".format(L_the[2][j]).zfill(7))*u)):
                 min=sum(L_exp[i]!=("{0:b}".format(L_the[2][j]).zfill(7))*u)
@@ -214,6 +215,11 @@ if __name__ == "__main__":
     y = [10, height-10]
     
     main(x, y, img, seuil)
+
+
+codage_chiffres_bin = [["0001101", "0011001", "0010011", "0111101", "0100011", "0110001", "0101111", "0111011", "0110111", "0001011"]
+                   ["0100111", "0110011", "0011011", "0100001", "0011101", "0111001", "0000101", "0010001", "0001001", "0010111"]
+                   ["1110010", "1100110", "1101100", "1000010", "1011100", "1001110", "1010000", "1000100", "1001000", "1110100"]]
 
 """
 x1=2
