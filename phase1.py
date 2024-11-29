@@ -74,9 +74,24 @@ def compare(L_exp,L_the):
                 decode[i]=L_the[1,j]
         min=len(L_exp[0])
     return decode,r
+
+def clef_controle(decode):
+    # Complément à 10 du dernier chiffre du code barre
+    complement = 10 - decode[-1]
+    
+    # Somme des chiffres de rangs impairs
+    somme_impair = 0
+    for i in range(1, 12, 2): 
+        somme_impair += decode[i-1]
+
+    # Somme des chiffres de rangs pairs
+    somme_pair = 0
+    for i in range(2, 13, 2):
+        somme_pair += decode[i-1]
     
     
-        
+    clef = (somme_impair + 3 * somme_pair) % 10
+    return clef == complement
 
 x1=2
 x2=5
@@ -85,4 +100,6 @@ y2=6
 Nb=np.ceil(distance(x1, y1, x2, y2)).astype(int)
 X,Y=echantillonnage(x1,y1,x2,y2,Nb)
 print(X,Y)
-L=[[13,25,19,61,35,49,47,59,55,11],[43,51,27,33,29,57,5,17,9,23],[114,102,108,66,92,78,80,68,72,116]]
+L=[[13,25,19,61,35,49,47,59,55,11],
+   [43,51,27,33,29,57,5,17,9,23],
+   [114,102,108,66,92,78,80,68,72,116]]
