@@ -68,15 +68,17 @@ def echantillonnage(x1,y1,x2,y2,Nb_points):
 def find_lim(x1,y1,x2,y2,img,seuil):
     """Récupération des points de départ et d'arrivée pour le segment 2"""
     X,Y=echantillonnage(x1,y1,x2,y2,np.ceil(distance(x1, y1, x2, y2)).astype(int))
-    L = img[Y, X] > seuil #Binarisation
+    valeurs_img=np.zeros(1,len(X))
+    for i in range(0,len(X)):
+        valeurs_img[i]=(img[X[i],Y[i]])>=seuil
     i1=0
     i2=0
-    for i in range(0,len(L)):
-        if L[i]==0:
+    for i in range(0,len(valeurs_img)):
+        if valeurs_img[i]==0:
             i1=i
             break
-    for i in range(len(L)-1,1,-1):
-        if L[i]==0:
+    for i in range(len(valeurs_img)-1,1,-1):
+        if valeurs_img[i]==0:
             i2=i
             break
     return X[i1],Y[i1],X[i2],Y[i2] # xd,yd,xa,ya
@@ -89,7 +91,11 @@ def find_u(xd,yd,xa,ya,img,seuil):
     while (Nb_points<nb_p):
         Nb_points+=95
         u+=1
-    return img[echantillonnage(xd,yd,xa,ya,Nb_points)]>=seuil,u #Echantillonnage et binarisation
+    X,Y=echantillonnage(xd,yd,xa,ya,Nb_points)
+    valeurs_img=np.zeros(len(X))
+    for i in range(0,len(X)):
+        valeurs_img[i]=(img[X[i],Y[i]])>=seuil
+    return valeurs_img,u #Echantillonnage et binarisation
 
 def separate(l_bin,u):
     L=np.zeros(12,u*7)
