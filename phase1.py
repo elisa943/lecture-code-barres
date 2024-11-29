@@ -50,7 +50,7 @@ def compare(L_exp,L_the):
     min=len(L_exp[0])
     u=len(L_exp[0])/7
     decode=np.zeros(1,12)
-    r=np.zeros(1,6)
+    r="000000"
     L_compar=np.copy(L_the)
     for j in range(0,len(L_the[0])):
         L_compar[1,j]=("{0:b}".format(L_the[1,i]).zfill(7))*u
@@ -61,21 +61,26 @@ def compare(L_exp,L_the):
             if (min>sum(L_exp[i]!=L_compar[1,j])):
                 min=sum(L_exp[i]!=L_compar[1,j])
                 decode[i]=L_the[1,j]
-                r[i]=1
+                r[i]='A'
             if (min>sum(L_exp[i]!=L_compar[2,j])):
                 min=sum(L_exp[i]!=L_compar[2,j])
                 decode[i]=L_the[2,j]
-                r[i]=2
+                r[i]='B'
         min=len(L_exp[0])
-    for i in range(0,len(L_exp)/2):
+    for i in range(len(L_exp)/2,len(L_exp)):
         for j in range(0,len(L_compar[0])):
             if (min>sum(L_exp[i]!=L_compar[3,j])):
                 min=sum(L_exp[i]!=L_compar[1,j])
                 decode[i]=L_the[1,j]
         min=len(L_exp[0])
     return decode,r
-    
-    
+
+def first_one(decode,r,tab):
+    for i in range(0,len(tab)):
+        if (r==tab[i]):
+            decode=[i]+decode
+            return decode
+    return "ERROR"
         
 
 x1=2
@@ -86,3 +91,4 @@ Nb=np.ceil(distance(x1, y1, x2, y2)).astype(int)
 X,Y=echantillonnage(x1,y1,x2,y2,Nb)
 print(X,Y)
 L=[[13,25,19,61,35,49,47,59,55,11],[43,51,27,33,29,57,5,17,9,23],[114,102,108,66,92,78,80,68,72,116]]
+Tab_pr=["AAAAAA","AABABB","AABBAB","AABBBA","ABAABB","ABBAAB","ABBBAA","ABABAB","ABABBA","ABBABA"]
