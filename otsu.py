@@ -6,7 +6,7 @@ img = plt.imread('code_barre.png')
 
 def otsu(img, bins=255, displayHisto=False):
     luminance = None
-    print("Image shape: ", img.shape)
+    
     # Si l'image est en couleur (3 dimensions)
     if len(img.shape) == 3 and img.shape[2] > 1:
         # Calcul de la luminance 
