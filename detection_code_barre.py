@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Fri Nov 29 17:24:36 2024
-
-@author: Admin
 """
 
 import numpy as np
@@ -47,21 +45,15 @@ def plot_channels(channels, titles=None, res_factor=1):
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ PARAMETRES FILTRES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # %%
-# Pour le bruit
+# Pour le bruit, à regler à la main
 sigma_bruit = 2
 
-# Pour le gradient
+# Pour le gradient, relativement faible pour trouver les vecteurs de transition correspondant aux barres
 sigma_g = 1
 
-# Pour le tenseur
+# Pour le tenseur, relativement élevé pour trouer des clusters de vecteurs gradient
 sigma_t = 15
 
-"""
-sigma canny:
-    relativement faible pour trouver les vecteurs de transition correspondant aux barres
-sigma T:
-    relativement élevé pour trouer des clusters de vecteurs gradient
-"""
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Préparation de l'image ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # %%
 img_code_barre = plt.imread('img/code_barre_prof.jpg')
@@ -242,7 +234,6 @@ def random_ray_center(h, w, length):
     # méthode: centre, angle, longueur
     angle = np.random.uniform(0, 2*np.pi)
     r = length/2
-
     center = np.array([np.random.randint(0, h), np.random.randint(0, w)])
     offset = np.array([np.cos(angle), np.sin(angle)])*r
     x1 = center+offset
