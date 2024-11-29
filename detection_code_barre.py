@@ -9,6 +9,8 @@ from copy import deepcopy
 from scipy import signal, ndimage
 from scipy.interpolate import RectBivariateSpline
 from skimage.morphology import closing, square
+from time import time
+start_time=time()
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # %%
 def read(title): return plt.imread("img/"+title)
@@ -39,12 +41,15 @@ def plot_channels(channels, titles=None, res_factor=1):
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ PARAMETRES FILTRES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # %%
+# Pour le bruit
+sigma_bruit=1.5
 
 # Pour le gradient
 sigma_g = 1     
 
 # Pour le tenseur
 sigma_t = 15
+
 
 """
 sigma canny:
@@ -64,7 +69,7 @@ img_code_barre_YCbCr = color.rgb2ycbcr(img_code_barre)
 Y_code_barre = img_code_barre_YCbCr[:, :, 0]
 Cb_code_barre = img_code_barre_YCbCr[:, :, 1]
 Cr_code_barre = img_code_barre_YCbCr[:, :, 2]
-
+Y_code_barre+= np.random.randn(len(Y_code_barre),len(Y_code_barre[0]))*sigma_bruit
 # ~~~~~~~~~~~~~~~~~~~ filtre ~~~~~~~~~~~~~~~~~~~
 
 
@@ -196,5 +201,40 @@ plt.title("D seuil")
 
 
 plt.show()
+print("f{time()-start_time} s")
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Lancer aléatoire ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# %%
+def bornage(h,w,p):
+    if p[0]<0:
+        p[0]=0
+    if p[0]>h:
+        p[0]=h
+    if p[1]<0:
+        p[1]=0 
+    if p[1]>w:
+        p[1]=w
+    return p
 
+# ajouter des paramètres pour avoir un tirage autre que uniforme
+
+def random_ray_center(h,w,length):
+    # méthode: centre, angle, longueur
+    angle=np.random.uniform(0,2*np.pi)
+    r=length/2
+    
+    center=np.array([np.random.randint(0,h),np.random.randint(0,w)])
+    offset=np.array([np.cos(angle),np.sin(angle)])*r
+    x1=center+offset
+    x2=center-offset
+    return np.int32([bornage(h,w,x1),bornage(h,w,x2)])
+
+def random_ray(h,w,length):
+    # méthode: extrémité1, angle, longueur
+    angle=np.random.uniform(0,2*np.pi)
+    
+    x1=np.array([np.random.randint(0,h),np.random.randint(0,w)])
+    offset=np.array([np.cos(angle),np.sin(angle)])*length
+    x2=x1+offset
+    
+    return np.int32([bornage(h,w,x1),bornage(h,w,x2)])
 
