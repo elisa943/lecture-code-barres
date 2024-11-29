@@ -5,7 +5,6 @@ from skimage.filters import threshold_otsu
 img = plt.imread('../img/pcb.jpg')
 
 def otsu(img, bins=255, displayHisto=False):
-    
     luminance = None
     print("Image shape: ", img.shape)
     # Si l'image est en couleur (3 dimensions)

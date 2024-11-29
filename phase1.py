@@ -1,4 +1,58 @@
 import numpy as np
+import matplotlib.pyplot as plt
+
+def otsu(img, bins=255, displayHisto=False):
+    luminance = None
+    print("Image shape: ", img.shape)
+    # Si l'image est en couleur (3 dimensions)
+    if len(img.shape) == 3:
+        # Calcul de la luminance 
+        luminance = np.array([[(img[i][j][0] + img[i][j][1] + img[i][j][2])//3 for j in range(img.shape[1])] for i in range(img.shape[0])])
+        luminance = luminance.ravel()
+    else:
+        luminance = img.ravel()
+    
+    # Création de l'histogramme
+    histogram, bin_edges = np.histogram(luminance.ravel(), range=(0, 255), bins=bins)
+    
+    # Moyenner l'histogramme
+    histogram = histogram/sum(histogram)    
+    
+    # Création d'un dico pour associer chaque valeur de luminance à sa fréquence
+    histogram_dic = {int(bin_edges[i]): histogram[i] for i in range(len(histogram))}
+    
+    # Initialisation des moyennes et poids initiaux
+    n = len(histogram_dic)
+    sumB = 0
+    wB = 0
+    maximum = 0.0
+    sum1 = sum(i * histogram_dic[i] for i in range(n))
+    total = sum(histogram_dic.values())
+    level = 0
+    for k in range(1, n):
+        wF = total - wB
+        if wB > 0 and wF > 0:
+            mF = (sum1 - sumB) / wF
+            val = wB * wF * (sumB / wB - mF) * (sumB / wB - mF)
+            
+            if val >= maximum:
+                level = k
+                maximum = val
+        
+        wB += histogram_dic[k]
+        sumB += (k-1) * histogram_dic[k] # A vérifier si c'est k ou k-1
+    
+    # Afficher l'histogramme
+    if displayHisto:
+        plt.figure()
+        plt.hist(luminance, bins=bins, range=(0, 255))
+        plt.axvline(level, color='r')
+        plt.title("Histogramme de la luminance")
+        plt.xlabel("Luminance")
+        plt.ylabel("Fréquence")
+        plt.show()
+    
+    return histogram, level
 
 def distance(x1,y1,x2,y2):
     """ Calcule la distance entre deux points """
@@ -14,7 +68,7 @@ def echantillonnage(x1,y1,x2,y2,Nb_points):
 def find_lim(x1,y1,x2,y2,img,seuil):
     """Récupération des points de départ et d'arrivée pour le segment 2"""
     X,Y=echantillonnage(x1,y1,x2,y2,np.ceil(distance(x1, y1, x2, y2)).astype(int))
-    L=img[X,Y]>=seuil #Binarisation
+    L = img[Y, X] > seuil #Binarisation
     i1=0
     i2=0
     for i in range(0,len(L)):
@@ -81,7 +135,7 @@ def first_one(decode,r,tab):
             decode=[i]+decode
             return decode
     return "ERROR"
-        
+
 def clef_controle(decode):
     # Complément à 10 du dernier chiffre du code barre
     complement = 10 - decode[-1]
@@ -100,6 +154,54 @@ def clef_controle(decode):
     clef = (somme_impair + 3 * somme_pair) % 10
     return clef == complement
 
+def main(x, y, img):
+    x1 = x[0]
+    y1 = y[0]
+    x2 = x[1]
+    y2 = y[1]
+    codage_chiffres = [[13,25,19,61,35,49,47,59,55,11],
+                       [43,51,27,33,29,57,5,17,9,23],
+                       [114,102,108,66,92,78,80,68,72,116]]
+    codage_premier_chiffre = ["AAAAAA","AABABB","AABBAB","AABBBA","ABAABB","ABBAAB","ABBBAA","ABABAB","ABABBA","ABBABA"]
+    Nb=np.ceil(distance(x1, y1, x2, y2)).astype(int) # Nombre de points
+    
+    # Seuillage avec la méthode d'Otsu
+    seuil = otsu(img)
+    
+    # Echantillonnage
+    X, Y = echantillonnage(x1,y1,x2,y2,Nb)
+    
+    # Binarisation
+    xd,yd,xa,ya = find_lim(x1,y1,x2,y2,img,seuil)
+    
+    # Echantillonage + Binarisation de l'image après seuillage 
+    img_seuillage, u = find_u(xd,yd,xa,ya,img,seuil)
+
+    regions_chiffres_bin = separate(img_seuillage,u)
+    
+    # Décodage des regions binaires
+    regions_chiffres, sequence_AB = compare(regions_chiffres_bin,codage_chiffres)
+    
+    # Ajout du premier chiffre
+    regions_chiffres = first_one(regions_chiffres,sequence_AB,codage_premier_chiffre)
+    
+    # Vérification de la clé de contrôle
+    if clef_controle(regions_chiffres):
+        print("Code barre valide : ", regions_chiffres)
+        return regions_chiffres
+    else:
+        print("Code barre invalide")
+
+if __name__ == "__main__":
+    img = plt.imread('code_barre.png')
+    
+    height, width, _ = img.shape
+    x = [10, width-10]
+    y = [10, height-10]
+    
+    main(x, y, img)
+
+"""
 x1=2
 x2=5
 y1=9
@@ -107,5 +209,6 @@ y2=6
 Nb=np.ceil(distance(x1, y1, x2, y2)).astype(int)
 X,Y=echantillonnage(x1,y1,x2,y2,Nb)
 print(X,Y)
-L=[[13,25,19,61,35,49,47,59,55,11],[43,51,27,33,29,57,5,17,9,23],[114,102,108,66,92,78,80,68,72,116]]
-Tab_pr=["AAAAAA","AABABB","AABBAB","AABBBA","ABAABB","ABBAAB","ABBBAA","ABABAB","ABABBA","ABBABA"]
+codage_chiffres = [[13,25,19,61,35,49,47,59,55,11],[43,51,27,33,29,57,5,17,9,23],[114,102,108,66,92,78,80,68,72,116]]
+codage_premier_chiffre = ["AAAAAA","AABABB","AABBAB","AABBBA","ABAABB","ABBAAB","ABBBAA","ABABAB","ABABBA","ABBABA"]
+"""
