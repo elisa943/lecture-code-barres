@@ -1,11 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import cv2
 
 def otsu(img, bins=255, displayHisto=False):
     luminance = None
-    print("Image shape: ", img.shape)
+    
     # Si l'image est en couleur (3 dimensions)
-    if len(img.shape) == 3:
+    if len(img.shape) == 3 and img.shape[2] > 1:
         # Calcul de la luminance 
         luminance = np.array([[(img[i][j][0] + img[i][j][1] + img[i][j][2])//3 for j in range(img.shape[1])] for i in range(img.shape[0])])
         luminance = luminance.ravel()
@@ -42,6 +43,8 @@ def otsu(img, bins=255, displayHisto=False):
         wB += histogram_dic[k]
         sumB += (k-1) * histogram_dic[k] # A vérifier si c'est k ou k-1
     
+    print("Seuil optimal: ", level)
+    
     # Afficher l'histogramme
     if displayHisto:
         plt.figure()
@@ -52,7 +55,7 @@ def otsu(img, bins=255, displayHisto=False):
         plt.ylabel("Fréquence")
         plt.show()
     
-    return histogram, level
+    return level
 
 def distance(x1,y1,x2,y2):
     """ Calcule la distance entre deux points """
@@ -68,11 +71,13 @@ def echantillonnage(x1,y1,x2,y2,Nb_points):
 def find_lim(x1,y1,x2,y2,img,seuil):
     """Récupération des points de départ et d'arrivée pour le segment 2"""
     X,Y=echantillonnage(x1,y1,x2,y2,np.ceil(distance(x1, y1, x2, y2)).astype(int))
-    valeurs_img=np.zeros(1,len(X))
+    valeurs_img=np.zeros((len(X), 1))
+
     for i in range(0,len(X)):
-        valeurs_img[i]=(img[X[i],Y[i]])>=seuil
+        valeurs_img[i]=(img[Y[i], X[i]]) >= seuil
     i1=0
     i2=0
+
     for i in range(0,len(valeurs_img)):
         if valeurs_img[i]==0:
             i1=i
@@ -92,46 +97,47 @@ def find_u(xd,yd,xa,ya,img,seuil):
         Nb_points+=95
         u+=1
     X,Y=echantillonnage(xd,yd,xa,ya,Nb_points)
-    valeurs_img=np.zeros(len(X))
+    valeurs_img=np.zeros((len(X), 1))
+    
     for i in range(0,len(X)):
-        valeurs_img[i]=(img[X[i],Y[i]])>=seuil
+        valeurs_img[i]=(img[Y[i], X[i]])>=seuil
+        
     return valeurs_img,u #Echantillonnage et binarisation
 
 def separate(l_bin,u):
-    L=np.zeros(12,u*7)
+    L=np.zeros((12,u*7))
     start=3*u
     for i in range(0,12):
         if (i==6):
             start=start+5*u
-        L[i,:]=l_bin[start+i*7*u:start+(i+1)*7*u]
+        l_bin_temp = l_bin[start+i*7*u : start+(i+1)*7*u]
+        
+        
+        for j in range(len(L[i])):
+            L[i,j] = l_bin_temp[j]
+        
     return L
 
-def compare(L_exp,L_the):
+def compare(L_exp,L_the,u):
     min=len(L_exp[0])
-    u=len(L_exp[0])/7
-    decode=np.zeros(1,12)
+    decode=np.zeros((1,12))
     r="000000"
-    L_compar=np.copy(L_the)
-    for j in range(0,len(L_the[0])):
-        L_compar[1,j]=("{0:b}".format(L_the[1,i]).zfill(7))*u
-        L_compar[2,j]=("{0:b}".format(L_the[2,i]).zfill(7))*u
-        L_compar[3,i]=("{0:b}".format(L_the[3,i]).zfill(7))*u
     for i in range(0,len(L_exp)/2):
-        for j in range(0,len(L_compar[0])):
-            if (min>sum(L_exp[i]!=L_compar[1,j])):
-                min=sum(L_exp[i]!=L_compar[1,j])
-                decode[i]=L_the[1,j]
+        for j in range(0,len(L_the[0])):
+            if (min>sum(L_exp[i]!=("{0:b}".format(L_the[0][j]).zfill(7))*u)):
+                min=sum(L_exp[i]!=("{0:b}".format(L_the[0][j]).zfill(7))*u)
+                decode[i]=L_the[0,j]
                 r[i]='A'
-            if (min>sum(L_exp[i]!=L_compar[2,j])):
-                min=sum(L_exp[i]!=L_compar[2,j])
-                decode[i]=L_the[2,j]
+            if (min>sum(L_exp[i]!=("{0:b}".format(L_the[1][j]).zfill(7))*u)):
+                min=sum(L_exp[i]!=("{0:b}".format(L_the[1][j]).zfill(7))*u)
+                decode[i]=L_the[1,j]
                 r[i]='B'
         min=len(L_exp[0])
     for i in range(len(L_exp)/2,len(L_exp)):
-        for j in range(0,len(L_compar[0])):
-            if (min>sum(L_exp[i]!=L_compar[3,j])):
-                min=sum(L_exp[i]!=L_compar[1,j])
-                decode[i]=L_the[1,j]
+        for j in range(0,len(L_the[0])):
+            if (min>sum(L_exp[i]!=("{0:b}".format(L_the[2][j]).zfill(7))*u)):
+                min=sum(L_exp[i]!=("{0:b}".format(L_the[2][j]).zfill(7))*u)
+                decode[i]=L_the[2,j]
         min=len(L_exp[0])
     return decode,r
 
@@ -160,7 +166,7 @@ def clef_controle(decode):
     clef = (somme_impair + 3 * somme_pair) % 10
     return clef == complement
 
-def main(x, y, img):
+def main(x, y, img, seuil):
     x1 = x[0]
     y1 = y[0]
     x2 = x[1]
@@ -170,10 +176,7 @@ def main(x, y, img):
                        [114,102,108,66,92,78,80,68,72,116]]
     codage_premier_chiffre = ["AAAAAA","AABABB","AABBAB","AABBBA","ABAABB","ABBAAB","ABBBAA","ABABAB","ABABBA","ABBABA"]
     Nb=np.ceil(distance(x1, y1, x2, y2)).astype(int) # Nombre de points
-    
-    # Seuillage avec la méthode d'Otsu
-    seuil = otsu(img)
-    
+
     # Echantillonnage
     X, Y = echantillonnage(x1,y1,x2,y2,Nb)
     
@@ -186,7 +189,7 @@ def main(x, y, img):
     regions_chiffres_bin = separate(img_seuillage,u)
     
     # Décodage des regions binaires
-    regions_chiffres, sequence_AB = compare(regions_chiffres_bin,codage_chiffres)
+    regions_chiffres, sequence_AB = compare(regions_chiffres_bin,codage_chiffres,u)
     
     # Ajout du premier chiffre
     regions_chiffres = first_one(regions_chiffres,sequence_AB,codage_premier_chiffre)
@@ -199,13 +202,18 @@ def main(x, y, img):
         print("Code barre invalide")
 
 if __name__ == "__main__":
-    img = plt.imread('code_barre.png')
+    img = cv2.imread('code_barre.png', cv2.IMREAD_GRAYSCALE)
     
-    height, width, _ = img.shape
+    # Seuillage avec la méthode d'Otsu
+    seuil = otsu(img)
+    
+    height = img.shape[0]
+    width  = img.shape[1]
+    
     x = [10, width-10]
     y = [10, height-10]
     
-    main(x, y, img)
+    main(x, y, img, seuil)
 
 """
 x1=2
