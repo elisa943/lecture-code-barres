@@ -45,8 +45,9 @@ sigma_g = 5
 size_gradient_filter = 10
 
 # Pour le tenseur
-size_tensor_filter=15
-sigma_t = 30      
+size_tensor_filter=40
+sigma_t = 30
+
 """
 sigma canny:
     relativement faible pour trouver les vecteurs de transition correspondant aux barres
@@ -123,7 +124,7 @@ Txy = signal.convolve2d(In_x*In_y, gauss2D, mode='same',
 T = np.block([[Txx, Txy], [Txy, Tyy]])
 # dt=np.linalg.det(T)
 # U, S, Vt = np.linalg.svd(T)
-def D(X, Y, Z): return np.sqrt((X-Y)**2+4*Z**2)/(X+Y)
+D=lambda X, Y, Z: np.sqrt((X-Y)**2+4*Z**2)/(X+Y)
 
 
 D_res = D(Txx, Tyy, Txy)
