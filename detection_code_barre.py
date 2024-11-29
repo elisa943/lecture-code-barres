@@ -44,7 +44,7 @@ def plot_channels(channels, titles=None, res_factor=1):
 sigma_g = 1     
 
 # Pour le tenseur
-sigma_t = 15
+sigma_t = 14
 
 """
 sigma canny:
@@ -133,7 +133,7 @@ T = np.block([[Txx, Txy], [Txy, Tyy]])
 D = lambda X,Y,Z: np.sqrt((X-Y)**2+4*Z**2)/(X+Y)
 D_res=D(Txx,Tyy,Txy)
 
-D_seuil=(D_res>0.7)
+D_seuil=(D_res>0.69)
 
 #plot_channels([img_code_barre,D_seuil])
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Mesure de coherence ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
