@@ -3,9 +3,8 @@ import matplotlib.pyplot as plt
 
 def otsu(img, bins=255, displayHisto=False):
     luminance = None
-    print("Image shape: ", img.shape)
     # Si l'image est en couleur (3 dimensions)
-    if len(img.shape) == 3:
+    if len(img.shape) == 3 and img.shape[2] > 1:
         # Calcul de la luminance 
         luminance = np.array([[(img[i][j][0] + img[i][j][1] + img[i][j][2])//3 for j in range(img.shape[1])] for i in range(img.shape[0])])
         luminance = luminance.ravel()
@@ -52,7 +51,7 @@ def otsu(img, bins=255, displayHisto=False):
         plt.ylabel("Fréquence")
         plt.show()
     
-    return histogram, level
+    return level
 
 def distance(x1,y1,x2,y2):
     """ Calcule la distance entre deux points """
@@ -68,11 +67,13 @@ def echantillonnage(x1,y1,x2,y2,Nb_points):
 def find_lim(x1,y1,x2,y2,img,seuil):
     """Récupération des points de départ et d'arrivée pour le segment 2"""
     X,Y=echantillonnage(x1,y1,x2,y2,np.ceil(distance(x1, y1, x2, y2)).astype(int))
-    valeurs_img=np.zeros(1,len(X))
+    valeurs_img=np.zeros((len(X), 1))
+
     for i in range(0,len(X)):
-        valeurs_img[i]=(img[X[i],Y[i]])>=seuil
+        valeurs_img[i]=(img[Y[i], X[i]]) < seuil
     i1=0
     i2=0
+    # print(valeurs_img)
     for i in range(0,len(valeurs_img)):
         if valeurs_img[i]==0:
             i1=i
@@ -92,24 +93,26 @@ def find_u(xd,yd,xa,ya,img,seuil):
         Nb_points+=95
         u+=1
     X,Y=echantillonnage(xd,yd,xa,ya,Nb_points)
-    valeurs_img=np.zeros(len(X))
+    valeurs_img=np.zeros((len(X), 1))
+    
     for i in range(0,len(X)):
-        valeurs_img[i]=(img[X[i],Y[i]])>=seuil
+        valeurs_img[i]=(img[Y[i], X[i]])>=seuil
+        
     return valeurs_img,u #Echantillonnage et binarisation
 
 def separate(l_bin,u):
-    L=np.zeros(12,u*7)
+    L=np.zeros((12,u*7))
     start=3*u
     for i in range(0,12):
         if (i==6):
             start=start+5*u
-        L[i,:]=l_bin[start+i*7*u:start+(i+1)*7*u]
+        L[i,:]=l_bin[start+i*7*u : start+(i+1)*7*u]
     return L
 
 def compare(L_exp,L_the):
     min=len(L_exp[0])
     u=len(L_exp[0])/7
-    decode=np.zeros(1,12)
+    decode=np.zeros((1,12))
     r="000000"
     L_compar=np.copy(L_the)
     for j in range(0,len(L_the[0])):
@@ -173,7 +176,7 @@ def main(x, y, img):
     
     # Seuillage avec la méthode d'Otsu
     seuil = otsu(img)
-    
+    print(seuil)
     # Echantillonnage
     X, Y = echantillonnage(x1,y1,x2,y2,Nb)
     
@@ -198,10 +201,22 @@ def main(x, y, img):
     else:
         print("Code barre invalide")
 
+def convert_to_grayscale(img):
+    if len(img.shape) == 3 and img.shape[2] == 4:
+        # Ignorer le canal alpha et utiliser les trois premiers canaux (R, G, B)
+        img = img[:, :, :3]
+    # Convertir en niveaux de gris
+    grayscale_img = np.dot(img[...,:3], [0.2989, 0.5870, 0.1140])
+    
+    return grayscale_img
+
 if __name__ == "__main__":
     img = plt.imread('code_barre.png')
+    img = convert_to_grayscale(img)
     
-    height, width, _ = img.shape
+    height = img.shape[0]
+    width  = img.shape[1]
+    
     x = [10, width-10]
     y = [10, height-10]
     

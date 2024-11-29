@@ -2,13 +2,13 @@ import matplotlib.pyplot as plt
 import numpy as np 
 from skimage.filters import threshold_otsu
 
-img = plt.imread('../img/pcb.jpg')
+img = plt.imread('code_barre.png')
 
 def otsu(img, bins=255, displayHisto=False):
     luminance = None
     print("Image shape: ", img.shape)
     # Si l'image est en couleur (3 dimensions)
-    if len(img.shape) == 3:
+    if len(img.shape) == 3 and img.shape[2] > 1:
         # Calcul de la luminance 
         luminance = np.array([[(img[i][j][0] + img[i][j][1] + img[i][j][2])//3 for j in range(img.shape[1])] for i in range(img.shape[0])])
         luminance = luminance.ravel()
