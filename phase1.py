@@ -122,28 +122,22 @@ def compare(L_exp,L_the,u):
     min=len(L_exp[0])
     decode=np.zeros((1,12))
     r="000000"
-    L_compar=np.copy(L_the)
-    for j in range(0,len(L_the[0])):
-        L_compar[0,j]=("{0:b}".format(L_the[0][j]).zfill(7))*u
-        
-        L_compar[1,j]=("{0:b}".format(L_the[1,j]).zfill(7))*u
-        L_compar[2,j]=("{0:b}".format(L_the[2,j]).zfill(7))*u
     for i in range(0,len(L_exp)/2):
-        for j in range(0,len(L_compar[0])):
-            if (min>sum(L_exp[i]!=L_compar[1,j])):
-                min=sum(L_exp[i]!=L_compar[1,j])
-                decode[i]=L_the[1,j]
+        for j in range(0,len(L_the[0])):
+            if (min>sum(L_exp[i]!=("{0:b}".format(L_the[0][j]).zfill(7))*u)):
+                min=sum(L_exp[i]!=("{0:b}".format(L_the[0][j]).zfill(7))*u)
+                decode[i]=L_the[0,j]
                 r[i]='A'
-            if (min>sum(L_exp[i]!=L_compar[2,j])):
-                min=sum(L_exp[i]!=L_compar[2,j])
-                decode[i]=L_the[2,j]
+            if (min>sum(L_exp[i]!=("{0:b}".format(L_the[1][j]).zfill(7))*u)):
+                min=sum(L_exp[i]!=("{0:b}".format(L_the[1][j]).zfill(7))*u)
+                decode[i]=L_the[1,j]
                 r[i]='B'
         min=len(L_exp[0])
     for i in range(len(L_exp)/2,len(L_exp)):
-        for j in range(0,len(L_compar[0])):
-            if (min>sum(L_exp[i]!=L_compar[3,j])):
-                min=sum(L_exp[i]!=L_compar[1,j])
-                decode[i]=L_the[1,j]
+        for j in range(0,len(L_the[0])):
+            if (min>sum(L_exp[i]!=("{0:b}".format(L_the[2][j]).zfill(7))*u)):
+                min=sum(L_exp[i]!=("{0:b}".format(L_the[2][j]).zfill(7))*u)
+                decode[i]=L_the[2,j]
         min=len(L_exp[0])
     return decode,r
 
