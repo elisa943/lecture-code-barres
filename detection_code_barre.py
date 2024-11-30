@@ -49,14 +49,14 @@ def plot_channels(channels, titles=None, res_factor=1):
 sigma_bruit = 1
 
 # Pour le gradient, relativement faible pour trouver les vecteurs de transition correspondant aux barres
-sigma_g = 1
+sigma_g = 4
 
 # Pour le tenseur, relativement élevé pour trouer des clusters de vecteurs gradient
-sigma_t = 15
+sigma_t = 10*sigma_g
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Préparation de l'image ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # %%
-img_code_barre = plt.imread('img/code_barre_prof.jpg')
+img_code_barre = plt.imread('img/barcode0.jpg')
 # ~~~~~~~~~~~~~~~~~~~~ transformation de rgb en ycrcb  ~~~~~~~~~~~~~~~~~~~
 img_code_barre_YCbCr = color.rgb2ycbcr(img_code_barre)
 Y_code_barre = img_code_barre_YCbCr[:, :, 0]
@@ -128,11 +128,16 @@ D_labeled,num_labels=measure.label(D_seuil,return_num=True)
 blobs=measure.regionprops(D_labeled)
 print(f"{num_labels} objects detected in img")
 coords=[x.coords for x in blobs]
-coords=coords[1:] #on ignore le fond (premier label)
+# coords=coords[1:] #on ignore le fond (premier label)
 X_blobs=[blobpixels[:,0] for blobpixels in coords]
 Y_blobs=[blobpixels[:,1] for blobpixels in coords]
 barycentres=[np.mean(x,axis=0) for x in coords] 
 matrices_cov=[np.cov(X_blobs[i],Y_blobs[i]) for i in range(len(X_blobs))]
+valeurs_propres=[0 for i in range(len(matrices_cov))] 
+vecteurs_propres=[0 for i in range(len(matrices_cov))]
+for i,M in enumerate(matrices_cov):
+    valeurs_propres[i],vecteurs_propres[i]=np.linalg.eig(M)
+    
 
 plt.figure(0)
 plt.subplot(1, 2, 1)
