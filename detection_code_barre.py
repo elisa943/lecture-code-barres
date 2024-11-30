@@ -9,7 +9,7 @@ from matplotlib import cm
 from matplotlib.colors import ListedColormap
 from mpl_toolkits.mplot3d import Axes3D
 from math import ceil, floor, sqrt
-from skimage import io, color, feature
+from skimage import io, color, feature, measure
 from copy import deepcopy
 from scipy import signal, ndimage
 from scipy.interpolate import RectBivariateSpline
@@ -46,7 +46,7 @@ def plot_channels(channels, titles=None, res_factor=1):
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ PARAMETRES FILTRES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # %%
 # Pour le bruit, à regler à la main
-sigma_bruit = 2
+sigma_bruit = 1
 
 # Pour le gradient, relativement faible pour trouver les vecteurs de transition correspondant aux barres
 sigma_g = 1
@@ -122,7 +122,29 @@ D_res = D(Txx, Tyy, Txy)
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Seuillage ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 D_seuil = (D_res > 0.7)
 # D_seuil_closed = closing(D_seuil, square(sigma_g*3)) # ne semble pas améliorer les performances significativement
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Labelisation ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# %%
+D_labeled,num_labels=measure.label(D_seuil,return_num=True)
+blobs=measure.regionprops(D_labeled)
+print(f"{num_labels} objects detected in img")
+coords=[x.coords for x in blobs]
+coords=coords[1:] #on ignore le fond (premier label)
+X_blobs=[blobpixels[:,0] for blobpixels in coords]
+Y_blobs=[blobpixels[:,1] for blobpixels in coords]
+barycentres=[np.mean(x,axis=0) for x in coords] 
+matrices_cov=[np.cov(X_blobs[i],Y_blobs[i]) for i in range(len(X_blobs))]
 
+plt.figure(0)
+plt.subplot(1, 2, 1)
+plt.imshow(img_code_barre)
+plt.title("img origine")
+plt.subplot(1, 2, 2)
+plt.imshow(D_labeled, cmap=cm.BrBG_r)
+for p in barycentres:
+    plt.plot(p[1],p[0],"or",markersize=5)
+# plt.plot(400,400,"or")
+
+plt.title("img labelisee")
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Affichage ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # %%
 # print("Affichage...")
