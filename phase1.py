@@ -168,16 +168,9 @@ def first_one(decode,r,tab):
 def clef_controle(decode):
     # Complément à 10 du dernier chiffre du code barre
     complement = (10 - decode[-1]) % 10
-    
-    # Somme des chiffres de rangs pairs
-    somme_pair = 0
-    for i in range(1, len(decode), 2): 
-        somme_pair += decode[i-1]
 
-    # Somme des chiffres de rangs impairs
-    somme_impair = np.sum(decode) - somme_pair
-    
-    clef = (somme_impair + 3 * somme_pair) % 10
+    L = [1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3]
+    clef = np.sum(decode[0:-1] * L) % 10
     return clef == complement
 
 def phase1(x, y, img, seuil):
