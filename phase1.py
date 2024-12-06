@@ -177,9 +177,9 @@ def main(x, y, img, seuil):
     y1 = y[0]
     x2 = x[1]
     y2 = y[1]
-    codage_chiffres = [[13,25,19,61,35,49,47,59,55,11],
-                       [43,51,27,33,29,57,5,17,9,23],
-                       [114,102,108,66,92,78,80,68,72,116]]
+    codage_chiffres_bin = [["0001101", "0011001", "0010011", "0111101", "0100011", "0110001", "0101111", "0111011", "0110111", "0001011"]
+                           ["0100111", "0110011", "0011011", "0100001", "0011101", "0111001", "0000101", "0010001", "0001001", "0010111"]
+                           ["1110010", "1100110", "1101100", "1000010", "1011100", "1001110", "1010000", "1000100", "1001000", "1110100"]]
     codage_premier_chiffre = ["AAAAAA","AABABB","AABBAB","AABBBA","ABAABB","ABBAAB","ABBBAA","ABABAB","ABABBA","ABBABA"]
     Nb=np.ceil(distance(x1, y1, x2, y2)).astype(int) # Nombre de points
 
@@ -195,7 +195,7 @@ def main(x, y, img, seuil):
     regions_chiffres_bin = separate(img_seuillage,u)
     
     # Décodage des regions binaires
-    regions_chiffres, sequence_AB = compare(regions_chiffres_bin,codage_chiffres,u)
+    regions_chiffres, sequence_AB = compare(regions_chiffres_bin,codage_chiffres_bin,u)
     
     # Ajout du premier chiffre
     regions_chiffres = first_one(regions_chiffres,sequence_AB,codage_premier_chiffre)
@@ -220,6 +220,7 @@ if __name__ == "__main__":
     y = [10, height-10]
     
     main(x, y, img, seuil)
+
 
 """
 x1=2
