@@ -43,8 +43,6 @@ def otsu(img, bins=255, displayHisto=False):
         wB += histogram_dic[k]
         sumB += (k-1) * histogram_dic[k] # A vérifier si c'est k ou k-1
     
-    print("Seuil optimal: ", level)
-    
     # Afficher l'histogramme
     if displayHisto:
         plt.figure()
@@ -74,7 +72,7 @@ def find_lim(x1,y1,x2,y2,img,seuil):
     valeurs_img=np.zeros((len(X), 1))
 
     for i in range(0,len(X)):
-        valeurs_img[i]=(img[Y[i], X[i]]) >= seuil
+        valeurs_img[i]=(img[Y[i], X[i]]) <= seuil
     i1=0
     i2=0
 
@@ -90,29 +88,41 @@ def find_lim(x1,y1,x2,y2,img,seuil):
 
 def find_u(xd,yd,xa,ya,img,seuil):
     """On va prendre le multiple u et le signal binaire à analyser"""
-    nb_p=np.ceil(distance(xd,yd,xa,ya))
-    Nb_points=0
+    nb_p=np.ceil(distance(xd,yd,xa,ya)).astype(int) # Nombre de points L'
+    Nb_points=0 # u * 95
     u=0
-    while (Nb_points<nb_p):
+    while (Nb_points<=nb_p): # On cherche le plus petit u tq u * 95 > nb_p
         Nb_points+=95
         u+=1
+    
     X,Y=echantillonnage(xd,yd,xa,ya,Nb_points)
     valeurs_img=np.zeros((len(X), 1))
     
     for i in range(0,len(X)):
-        valeurs_img[i]=(img[Y[i], X[i]])>=seuil
-        
+        valeurs_img[i]=(img[Y[i], X[i]]) <= seuil
+    
+    """ A mettre dans le rapport
+    plt.figure()
+    plt.imshow(img, cmap='gray')
+    for i in range(len(valeurs_img)):
+        if valeurs_img[i]: # Noir
+            plt.plot(X[i],Y[i],'r.')
+        else: # Blanc
+            plt.plot(X[i],Y[i],'b.')
+    plt.show()
+    """
+    
     return valeurs_img,u #Echantillonnage et binarisation
 
-def separate(l_bin,u):
+def separate(segment_seuille,u):
     L=np.zeros((12,u*7))
-    start=3*u
+    start=3*u # Détermine les "gardes" (offset)
     for i in range(0,12):
         if (i==6):
             start=start+5*u
-        l_bin_temp = l_bin[start+i*7*u : start+(i+1)*7*u]
+        segment_seuille_temp = segment_seuille[start+i*7*u : start+(i+1)*7*u]
         for j in range(len(L[i])):
-            L[i,j] = l_bin_temp[j,0]  
+            L[i,j] = segment_seuille_temp[j,0]  
     return L
 
 def norme_binaire(liste_binaire,chaine_binaire):
@@ -180,21 +190,30 @@ def main(x, y, img, seuil):
                            ["1110010", "1100110", "1101100", "1000010", "1011100", "1001110", "1010000", "1000100", "1001000", "1110100"]]
     codage_premier_chiffre = ["AAAAAA","AABABB","AABBAB","AABBBA","ABAABB","ABBAAB","ABBBAA","ABABAB","ABABBA","ABBABA"]
     Nb=np.ceil(distance(x1, y1, x2, y2)).astype(int) # Nombre de points
-
-    # Echantillonnage
-    X, Y = echantillonnage(x1,y1,x2,y2,Nb)
     
     # Binarisation
     xd,yd,xa,ya = find_lim(x1,y1,x2,y2,img,seuil)
     
+    """ A mettre dans le rapport 
+    plt.figure()
+    plt.imshow(img, cmap='gray')
+    plt.plot([xd, xa], [yd, ya], 'ro-')
+    plt.plot([x1, x2], [y1, y2], 'go-')
+    plt.show()
+    """
+    
     # Echantillonage + Binarisation de l'image après seuillage 
-    img_seuillage, u = find_u(xd,yd,xa,ya,img,seuil)
-    regions_chiffres_bin = separate(img_seuillage,u)
+    segment_seuillage, u = find_u(xd,yd,xa,ya,img,seuil)
+    regions_chiffres_bin = separate(segment_seuillage,u)
+    
     # Décodage des regions binaires
     regions_chiffres, sequence_AB = compare(regions_chiffres_bin,codage_chiffres_bin,u)
     print(regions_chiffres,sequence_AB)
+    
     # Ajout du premier chiffre
     regions_chiffres = first_one(regions_chiffres,sequence_AB,codage_premier_chiffre)
+    print(regions_chiffres)
+    
     # Vérification de la clé de contrôle
     if clef_controle(regions_chiffres):
         print("Code barre valide : ", regions_chiffres)
@@ -212,7 +231,7 @@ if __name__ == "__main__":
     width  = img.shape[1]
     
     x = [10, width-10]
-    y = [10, height-10]
+    y = [height//2, height//2]
     
     main(x, y, img, seuil)
 
