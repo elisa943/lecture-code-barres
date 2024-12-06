@@ -118,27 +118,33 @@ def separate(l_bin,u):
         
     return L
 
-def compare(L_exp,L_the,u):
-    min=len(L_exp[0])
+def norme_binaire(liste_binaire,chaine_binaire):
+    sum=0
+    for i in range(0,len(liste_binaire)):
+        sum+=(liste_binaire(i)!=int(chaine_binaire(i)))
+    return sum
+
+def compare(region_chiffres_bin,L_the,u):
+    norm_codes=len(region_chiffres_bin[0])
     decode=np.zeros((1,12))
     r="000000"
-    for i in range(0,len(L_exp)/2):
+    for i in range(0,6):
         for j in range(0,len(L_the[0])):
-            if (min>sum(L_exp[i]!=("{0:b}".format(L_the[0][j]).zfill(7))*u)):
-                min=sum(L_exp[i]!=("{0:b}".format(L_the[0][j]).zfill(7))*u)
-                decode[i]=L_the[0,j]
+            if (normes_codes>norme_binaire(region_chiffres_bin(i),L_the(0,j)*u)):
+                normes_codes=norme_binaire(region_chiffres_bin(i),L_the(0,j)*u)
+                decode[i]=j
                 r[i]='A'
-            if (min>sum(L_exp[i]!=("{0:b}".format(L_the[1][j]).zfill(7))*u)):
-                min=sum(L_exp[i]!=("{0:b}".format(L_the[1][j]).zfill(7))*u)
-                decode[i]=L_the[1,j]
+            if (normes_codes>norme_binaire(region_chiffres_bin(i),L_the(1,j)*u)):
+                normes_codes=norme_binaire(region_chiffres_bin(i),L_the(1,j)*u)
+                decode[i]=j
                 r[i]='B'
-        min=len(L_exp[0])
-    for i in range(len(L_exp)/2,len(L_exp)):
+        normes_codes=len(region_chiffres_bin[0])
+    for i in range(6,len(region_chiffres_bin)):
         for j in range(0,len(L_the[0])):
-            if (min>sum(L_exp[i]!=("{0:b}".format(L_the[2][j]).zfill(7))*u)):
-                min=sum(L_exp[i]!=("{0:b}".format(L_the[2][j]).zfill(7))*u)
-                decode[i]=L_the[2,j]
-        min=len(L_exp[0])
+            if (normes_codes>norme_binaire(region_chiffres_bin(i),L_the(2,j)*u)):
+                normes_codes=norme_binaire(region_chiffres_bin(i),L_the(2,j)*u)
+                decode[i]=j
+        normes_codes=len(region_chiffres_bin[0])
     return decode,r
 
 def first_one(decode,r,tab):
