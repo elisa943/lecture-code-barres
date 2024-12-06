@@ -139,18 +139,18 @@ def compare(region_chiffres_bin,L_the,u):
     for i in range(0,6):
         r_b=r
         for j in range(0,len(L_the[0])):
-            if (normes_codes>norme_binaire(region_chiffres_bin[i],L_the[0][j],u)):
+            if (normes_codes>=norme_binaire(region_chiffres_bin[i],L_the[0][j],u)):
                 normes_codes=norme_binaire(region_chiffres_bin[i],L_the[0][j],u)
                 decode[i]=int(j)
                 r=r_b+"A"
-            if (normes_codes>norme_binaire(region_chiffres_bin[i],L_the[1][j],u)):
+            if (normes_codes>=norme_binaire(region_chiffres_bin[i],L_the[1][j],u)):
                 normes_codes=norme_binaire(region_chiffres_bin[i],L_the[1][j],u)
                 decode[i]=int(j)
                 r=r_b+"B"
         normes_codes=len(region_chiffres_bin[0])
     for i in range(6,len(region_chiffres_bin)):
         for j in range(0,len(L_the[0])):
-            if (normes_codes>norme_binaire(region_chiffres_bin[i],L_the[2][j],u)):
+            if (normes_codes>=norme_binaire(region_chiffres_bin[i],L_the[2][j],u)):
                 normes_codes=norme_binaire(region_chiffres_bin[i],L_the[2][j],u)
                 decode[i]=int(j)
         normes_codes=len(region_chiffres_bin[0])
