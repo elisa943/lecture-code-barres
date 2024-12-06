@@ -77,11 +77,11 @@ def find_lim(x1,y1,x2,y2,img,seuil):
     i2=0
 
     for i in range(0,len(valeurs_img)):
-        if valeurs_img[i]==0:
+        if valeurs_img[i]==1:
             i1=i
             break
     for i in range(len(valeurs_img)-1,1,-1):
-        if valeurs_img[i]==0:
+        if valeurs_img[i]==1:
             i2=i
             break
     return X[i1],Y[i1],X[i2],Y[i2] # xd,yd,xa,ya
@@ -111,7 +111,7 @@ def find_u(xd,yd,xa,ya,img,seuil):
             plt.plot(X[i],Y[i],'b.')
     plt.show()
     """
-    
+
     return valeurs_img,u #Echantillonnage et binarisation
 
 def separate(segment_seuille,u):
@@ -121,8 +121,10 @@ def separate(segment_seuille,u):
         if (i==6):
             start=start+5*u
         segment_seuille_temp = segment_seuille[start+i*7*u : start+(i+1)*7*u]
+
         for j in range(len(L[i])):
             L[i,j] = segment_seuille_temp[j,0]  
+
     return L
 
 def norme_binaire(liste_binaire,chaine_binaire):
@@ -156,10 +158,11 @@ def compare(region_chiffres_bin,L_the,u):
     return decode,r
 
 def first_one(decode,r,tab):
+    """ Retourne le premier chiffre """
     for i in range(0,len(tab)):
         if (r==tab[i]):
-            decode=[i]+decode
-            return decode
+            print("Premier chiffre : ", i)
+            return i
     return "ERROR"
 
 def clef_controle(decode):
@@ -211,15 +214,16 @@ def main(x, y, img, seuil):
     print(regions_chiffres,sequence_AB)
     
     # Ajout du premier chiffre
-    regions_chiffres = first_one(regions_chiffres,sequence_AB,codage_premier_chiffre)
-    print(regions_chiffres)
+    premier_chiffre = first_one(regions_chiffres,sequence_AB,codage_premier_chiffre)
+    code_barre = np.append(premier_chiffre, regions_chiffres)
     
     # Vérification de la clé de contrôle
-    if clef_controle(regions_chiffres):
-        print("Code barre valide : ", regions_chiffres)
-        return regions_chiffres
+    if clef_controle(code_barre):
+        print("Code barre valide : ", code_barre)
+        return code_barre
     else:
         print("Code barre invalide")
+        return None  
 
 if __name__ == "__main__":
     img = cv2.imread('code_barre.png', cv2.IMREAD_GRAYSCALE)
