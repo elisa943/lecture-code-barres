@@ -42,21 +42,33 @@ def plot_channels(channels, titles=None, res_factor=1):
     # plt.tight_layout()
     return
 
+def bornage(h, w, p): # à voir si une accélération est possible
+    if p[0] < 0:
+        p[0] = 0
+    if p[0] > h:
+        p[0] = h
+    if p[1] < 0:
+        p[1] = 0
+    if p[1] > w:
+        p[1] = w
+    return p
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ PARAMETRES FILTRES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # %%
 # Pour le bruit, à regler à la main
-sigma_bruit = 1
+sigma_bruit =3
 
 # Pour le gradient, relativement faible pour trouver les vecteurs de transition correspondant aux barres
-sigma_g = 4
+sigma_g = 1
+
 
 # Pour le tenseur, relativement élevé pour trouer des clusters de vecteurs gradient
 sigma_t = 10*sigma_g
 
+
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Préparation de l'image ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # %%
-img_code_barre = plt.imread('img/barcode0.jpg')
+img_code_barre = plt.imread('img/code_barre_prof.jpg')
 # ~~~~~~~~~~~~~~~~~~~~ transformation de rgb en ycrcb  ~~~~~~~~~~~~~~~~~~~
 img_code_barre_YCbCr = color.rgb2ycbcr(img_code_barre)
 Y_code_barre = img_code_barre_YCbCr[:, :, 0]
@@ -116,6 +128,7 @@ T = np.block([[Txx, Txy], [Txy, Tyy]])
 # méthode avec les valeurs propres possibles seulement si la matrice est carée
 def D(X, Y, Z): return np.sqrt((X-Y)**2+4*Z**2)/(X+Y)
 
+
 D_res = D(Txx, Tyy, Txy)
 
 
@@ -132,12 +145,17 @@ coords=[x.coords for x in blobs]
 X_blobs=[blobpixels[:,0] for blobpixels in coords]
 Y_blobs=[blobpixels[:,1] for blobpixels in coords]
 barycentres=[np.mean(x,axis=0) for x in coords] 
+
 matrices_cov=[np.cov(X_blobs[i],Y_blobs[i]) for i in range(len(X_blobs))]
 valeurs_propres=[0 for i in range(len(matrices_cov))] 
 vecteurs_propres=[0 for i in range(len(matrices_cov))]
 for i,M in enumerate(matrices_cov):
     valeurs_propres[i],vecteurs_propres[i]=np.linalg.eig(M)
-    
+#print(barycentres)
+print("valeur propres")
+print(valeurs_propres)
+print("vecteur propre")
+print(vecteurs_propres[0])
 
 plt.figure(0)
 plt.subplot(1, 2, 1)
@@ -148,8 +166,18 @@ plt.imshow(D_labeled, cmap=cm.BrBG_r)
 for p in barycentres:
     plt.plot(p[1],p[0],"or",markersize=5)
 # plt.plot(400,400,"or")
+pt_interet=[]
+for j in range(len(barycentres)):
+    pt_interet.append([[barycentres[j][1]+valeurs_propres[j][0]/2*vecteurs_propres[j][0][0],barycentres[j][0]+valeurs_propres[j][0]/2*vecteurs_propres[j][0][1]],[barycentres[j][1]-valeurs_propres[j][0]/2*vecteurs_propres[j][0][0],barycentres[j][0]-valeurs_propres[j][0]/2*vecteurs_propres[j][0][1]]])
 
+for p in pt_interet:
+    p[0]=bornage(h,w,p[0])
+    p[1]=bornage(h,w,p[1])
+    plt.plot(p[0][0],p[0][1],"ob",markersize=5)
+    plt.plot(p[1][0],p[1][1],"ob",markersize=5)
+plt.colorbar()
 plt.title("img labelisee")
+
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Affichage ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # %%
 # print("Affichage...")
@@ -224,21 +252,11 @@ plt.subplot(1, 2, 2)
 plt.imshow(D_seuil, cmap='gray')
 plt.title("D seuil")
 
-# plt.show() # rajoute plus d'une seconde à l'exécution, pourquoi?
+plt.show() # rajoute plus d'une seconde à l'exécution, pourquoi?
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Lancer aléatoire ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # %%
 
-def bornage(h, w, p): # à voir si une accélération est possible
-    if p[0] < 0:
-        p[0] = 0
-    if p[0] > h:
-        p[0] = h
-    if p[1] < 0:
-        p[1] = 0
-    if p[1] > w:
-        p[1] = w
-    return p
 
 # ajouter des paramètres pour avoir un tirage gaussien (ou autre)
 
