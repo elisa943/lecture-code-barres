@@ -53,7 +53,7 @@ def bornage(h, w, p): # à voir si une accélération est possible
         p[1] = w
     return p
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ PARAMETRES FILTRES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ PARAMETRES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # %%
 # Pour le bruit, à regler à la main
 sigma_bruit =3
@@ -65,7 +65,7 @@ sigma_g = 1
 # Pour le tenseur, relativement élevé pour trouer des clusters de vecteurs gradient
 sigma_t = 10*sigma_g
 
-
+seuil = 0.7
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Préparation de l'image ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # %%
 img_code_barre = plt.imread('img/code_barre_prof.jpg')
@@ -133,15 +133,61 @@ D_res = D(Txx, Tyy, Txy)
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Seuillage ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-D_seuil = (D_res > 0.7)
+D_seuil = (D_res > seuil)
 # D_seuil_closed = closing(D_seuil, square(sigma_g*3)) # ne semble pas améliorer les performances significativement
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Labelisation ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # %%
+
+class Blob:
+    def __init__(self, pixels=None,X=None,Y=None, barycentre=None, valeurs_propres=None, vecteurs_propres=None,area=None):
+        self.pixels = pixels 
+        self.X = X
+        self.Y = Y 
+        self.barycentre = barycentre 
+        self.valeurs_propres = valeurs_propres 
+        self.vecteurs_propres = vecteurs_propres 
+        self.area
+    def calc_XY(self):
+        self.X,self.Y=self.pixels[:,0],self.pixels[:,1]
+        return self.X,self.Y
+    def calc_braycentre(self):
+        self.barycentre=np.mean(self.pixels,axis=0)
+        return self.barycentre
+    def calc_vpropres(self):
+        # self.calc_XY() if (None in [self.X,self.Y]) else print("X,Y déjà définis")
+        self.valeurs_propres,self.vecteurs_propres=np.linalg.eig(np.cov(self.X,self.Y))
+        return self.valeurs_propres,self.vecteurs_propres
+    def calc_area(self):
+        self.area=self.pixels.size # not the real area, but a good measure of how large it is
+        return
+    def calc_axis(self):
+        
+        return
+    def calc_all(self):
+        try:
+            self.calc_XY()
+            self.calc_braycentre()
+            self.calc_vpropres()
+            return True
+        except Exception as e:
+            print(e)
+            return False
+    def __repr__(self):
+        
+        return 
+        
+
 D_labeled,num_labels=measure.label(D_seuil,return_num=True)
 blobs=measure.regionprops(D_labeled)
 print(f"{num_labels} objects detected in img")
 coords=[x.coords for x in blobs]
-# coords=coords[1:] #on ignore le fond (premier label)
+
+# # en implémentant la classe:
+# Blobs=[Blob(pixels=x.coords) for x in blobs]
+# print(False not in [b.calc_all() for b in Blobs])
+
+# Sans implémentation de la classe Blob:
+coords=coords[1:] #on ignore le fond (premier label)
 X_blobs=[blobpixels[:,0] for blobpixels in coords]
 Y_blobs=[blobpixels[:,1] for blobpixels in coords]
 barycentres=[np.mean(x,axis=0) for x in coords] 
@@ -178,6 +224,13 @@ for p in pt_interet:
 plt.colorbar()
 plt.title("img labelisee")
 
+i0,i1=(0,1)
+Ratios=[v[i1]/v[i0] for v in valeurs_propres]
+mx=max(Ratios)
+best_fit=[i for i,e in enumerate(Ratios) if e==mx]
+assert(len(best_fit)==1)
+
+final_blob=best_fit[0]
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Affichage ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # %%
 # print("Affichage...")
@@ -252,11 +305,24 @@ plt.subplot(1, 2, 2)
 plt.imshow(D_seuil, cmap='gray')
 plt.title("D seuil")
 
+plt.figure(6)
+plt.subplot(1, 2, 1)
+plt.imshow(img_code_barre)
+plt.title("img origine")
+plt.subplot(1, 2, 2)
+plt.imshow(D_labeled, cmap=cm.BrBG_r)
+for p in barycentres:
+    plt.plot(p[1],p[0],"or",markersize=5)
+# plt.plot(400,400,"or")
+plt.title("img labelisee")
+
 plt.show() # rajoute plus d'une seconde à l'exécution, pourquoi?
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Lancer aléatoire ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Fonctions tracé de rayons ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # %%
 
+def bornage2(h,w,ray):
+    return np.array(bornage(h,w,ray[0]),bornage(h,w,ray[1]))
 
 # ajouter des paramètres pour avoir un tirage gaussien (ou autre)
 
