@@ -111,39 +111,37 @@ def separate(l_bin,u):
         if (i==6):
             start=start+5*u
         l_bin_temp = l_bin[start+i*7*u : start+(i+1)*7*u]
-        
-        
         for j in range(len(L[i])):
-            L[i,j] = l_bin_temp[j]
-        
+            L[i,j] = l_bin_temp[j,0]  
     return L
 
 def norme_binaire(liste_binaire,chaine_binaire):
     sum=0
     for i in range(0,len(liste_binaire)):
-        sum+=(liste_binaire(i)!=int(chaine_binaire(i)))
+        sum+=(liste_binaire[i]!=int(chaine_binaire[i]))
     return sum
 
 def compare(region_chiffres_bin,L_the,u):
-    norm_codes=len(region_chiffres_bin[0])
-    decode=np.zeros((1,12))
-    r="000000"
+    normes_codes=len(region_chiffres_bin[0])
+    decode=np.zeros((12))
+    r=""
     for i in range(0,6):
+        r_b=r
         for j in range(0,len(L_the[0])):
-            if (normes_codes>norme_binaire(region_chiffres_bin(i),L_the(0,j)*u)):
-                normes_codes=norme_binaire(region_chiffres_bin(i),L_the(0,j)*u)
-                decode[i]=j
-                r[i]='A'
-            if (normes_codes>norme_binaire(region_chiffres_bin(i),L_the(1,j)*u)):
-                normes_codes=norme_binaire(region_chiffres_bin(i),L_the(1,j)*u)
-                decode[i]=j
-                r[i]='B'
+            if (normes_codes>norme_binaire(region_chiffres_bin[i],L_the[0][j]*u)):
+                normes_codes=norme_binaire(region_chiffres_bin[i],L_the[0][j]*u)
+                decode[i]=int(j)
+                r=r_b+"A"
+            if (normes_codes>norme_binaire(region_chiffres_bin[i],L_the[1][j]*u)):
+                normes_codes=norme_binaire(region_chiffres_bin[i],L_the[1][j]*u)
+                decode[i]=int(j)
+                r=r_b+"B"
         normes_codes=len(region_chiffres_bin[0])
     for i in range(6,len(region_chiffres_bin)):
         for j in range(0,len(L_the[0])):
-            if (normes_codes>norme_binaire(region_chiffres_bin(i),L_the(2,j)*u)):
-                normes_codes=norme_binaire(region_chiffres_bin(i),L_the(2,j)*u)
-                decode[i]=j
+            if (normes_codes>norme_binaire(region_chiffres_bin[i],L_the[2][j]*u)):
+                normes_codes=norme_binaire(region_chiffres_bin[i],L_the[2][j]*u)
+                decode[i]=int(j)
         normes_codes=len(region_chiffres_bin[0])
     return decode,r
 
@@ -177,8 +175,8 @@ def main(x, y, img, seuil):
     y1 = y[0]
     x2 = x[1]
     y2 = y[1]
-    codage_chiffres_bin = [["0001101", "0011001", "0010011", "0111101", "0100011", "0110001", "0101111", "0111011", "0110111", "0001011"]
-                           ["0100111", "0110011", "0011011", "0100001", "0011101", "0111001", "0000101", "0010001", "0001001", "0010111"]
+    codage_chiffres_bin = [["0001101", "0011001", "0010011", "0111101", "0100011", "0110001", "0101111", "0111011", "0110111", "0001011"],
+                           ["0100111", "0110011", "0011011", "0100001", "0011101", "0111001", "0000101", "0010001", "0001001", "0010111"],
                            ["1110010", "1100110", "1101100", "1000010", "1011100", "1001110", "1010000", "1000100", "1001000", "1110100"]]
     codage_premier_chiffre = ["AAAAAA","AABABB","AABBAB","AABBBA","ABAABB","ABBAAB","ABBBAA","ABABAB","ABABBA","ABBABA"]
     Nb=np.ceil(distance(x1, y1, x2, y2)).astype(int) # Nombre de points
@@ -191,15 +189,12 @@ def main(x, y, img, seuil):
     
     # Echantillonage + Binarisation de l'image après seuillage 
     img_seuillage, u = find_u(xd,yd,xa,ya,img,seuil)
-
     regions_chiffres_bin = separate(img_seuillage,u)
-    
     # Décodage des regions binaires
     regions_chiffres, sequence_AB = compare(regions_chiffres_bin,codage_chiffres_bin,u)
-    
+    print(regions_chiffres,sequence_AB)
     # Ajout du premier chiffre
     regions_chiffres = first_one(regions_chiffres,sequence_AB,codage_premier_chiffre)
-    
     # Vérification de la clé de contrôle
     if clef_controle(regions_chiffres):
         print("Code barre valide : ", regions_chiffres)
