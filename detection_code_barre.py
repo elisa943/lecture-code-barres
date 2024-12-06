@@ -55,15 +55,16 @@ def bornage(h, w, p): # à voir si une accélération est possible
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ PARAMETRES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # %%
+
 # Pour le bruit, à regler à la main
-sigma_bruit =3
+sigma_bruit =1
 
 # Pour le gradient, relativement faible pour trouver les vecteurs de transition correspondant aux barres
 sigma_g = 1
 
 
 # Pour le tenseur, relativement élevé pour trouer des clusters de vecteurs gradient
-sigma_t = 10*sigma_g
+sigma_t = 15
 
 seuil = 0.7
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Préparation de l'image ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -187,7 +188,7 @@ coords=[x.coords for x in blobs]
 # print(False not in [b.calc_all() for b in Blobs])
 
 # Sans implémentation de la classe Blob:
-coords=coords[1:] #on ignore le fond (premier label)
+# coords=coords[1:] #on ignore le fond (premier label)
 X_blobs=[blobpixels[:,0] for blobpixels in coords]
 Y_blobs=[blobpixels[:,1] for blobpixels in coords]
 barycentres=[np.mean(x,axis=0) for x in coords] 
@@ -197,11 +198,12 @@ valeurs_propres=[0 for i in range(len(matrices_cov))]
 vecteurs_propres=[0 for i in range(len(matrices_cov))]
 for i,M in enumerate(matrices_cov):
     valeurs_propres[i],vecteurs_propres[i]=np.linalg.eig(M)
+
 #print(barycentres)
-print("valeur propres")
-print(valeurs_propres)
-print("vecteur propre")
-print(vecteurs_propres[0])
+# print("valeur propres")
+# print(valeurs_propres)
+# print("vecteur propre")
+# print(vecteurs_propres[0])
 
 plt.figure(0)
 plt.subplot(1, 2, 1)
@@ -211,7 +213,7 @@ plt.subplot(1, 2, 2)
 plt.imshow(D_labeled, cmap=cm.BrBG_r)
 for p in barycentres:
     plt.plot(p[1],p[0],"or",markersize=5)
-# plt.plot(400,400,"or")
+
 pt_interet=[]
 for j in range(len(barycentres)):
     pt_interet.append([[barycentres[j][1]+valeurs_propres[j][0]/2*vecteurs_propres[j][0][0],barycentres[j][0]+valeurs_propres[j][0]/2*vecteurs_propres[j][0][1]],[barycentres[j][1]-valeurs_propres[j][0]/2*vecteurs_propres[j][0][0],barycentres[j][0]-valeurs_propres[j][0]/2*vecteurs_propres[j][0][1]]])
@@ -224,13 +226,13 @@ for p in pt_interet:
 plt.colorbar()
 plt.title("img labelisee")
 
-i0,i1=(0,1)
-Ratios=[v[i1]/v[i0] for v in valeurs_propres]
-mx=max(Ratios)
-best_fit=[i for i,e in enumerate(Ratios) if e==mx]
-assert(len(best_fit)==1)
+# i0,i1=(0,1)
+# Ratios=[v[i1]/v[i0] for v in valeurs_propres]
+# mx=max(Ratios)
+# best_fit=[i for i,e in enumerate(Ratios) if e==mx]
+# assert(len(best_fit)==1)
 
-final_blob=best_fit[0]
+# final_blob=best_fit[0]
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Affichage ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # %%
 # print("Affichage...")
