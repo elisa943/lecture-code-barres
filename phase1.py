@@ -101,7 +101,6 @@ def find_u(xd,yd,xa,ya,img,seuil):
     for i in range(0,len(X)):
         valeurs_img[i]=(img[Y[i], X[i]]) <= seuil
     
-    """ A mettre dans le rapport
     plt.figure()
     plt.imshow(img, cmap='gray')
     for i in range(len(valeurs_img)):
@@ -110,7 +109,6 @@ def find_u(xd,yd,xa,ya,img,seuil):
         else: # Blanc
             plt.plot(X[i],Y[i],'b.')
     plt.show()
-    """
 
     return valeurs_img,u #Echantillonnage et binarisation
 
@@ -127,10 +125,11 @@ def separate(segment_seuille,u):
 
     return L
 
-def norme_binaire(liste_binaire,chaine_binaire):
+def norme_binaire(liste_binaire,chaine_binaire,u):
     sum=0
-    for i in range(0,len(liste_binaire)):
-        sum+=(liste_binaire[i]!=int(chaine_binaire[i]))
+    for k in range(0,7):
+        for i in range(0,u):
+            sum+=(liste_binaire[k*u+i]!=int(chaine_binaire[k]))
     return sum
 
 def compare(region_chiffres_bin,L_the,u):
@@ -140,19 +139,19 @@ def compare(region_chiffres_bin,L_the,u):
     for i in range(0,6):
         r_b=r
         for j in range(0,len(L_the[0])):
-            if (normes_codes>norme_binaire(region_chiffres_bin[i],L_the[0][j]*u)):
-                normes_codes=norme_binaire(region_chiffres_bin[i],L_the[0][j]*u)
+            if (normes_codes>norme_binaire(region_chiffres_bin[i],L_the[0][j],u)):
+                normes_codes=norme_binaire(region_chiffres_bin[i],L_the[0][j],u)
                 decode[i]=int(j)
                 r=r_b+"A"
-            if (normes_codes>norme_binaire(region_chiffres_bin[i],L_the[1][j]*u)):
-                normes_codes=norme_binaire(region_chiffres_bin[i],L_the[1][j]*u)
+            if (normes_codes>norme_binaire(region_chiffres_bin[i],L_the[1][j],u)):
+                normes_codes=norme_binaire(region_chiffres_bin[i],L_the[1][j],u)
                 decode[i]=int(j)
                 r=r_b+"B"
         normes_codes=len(region_chiffres_bin[0])
     for i in range(6,len(region_chiffres_bin)):
         for j in range(0,len(L_the[0])):
-            if (normes_codes>norme_binaire(region_chiffres_bin[i],L_the[2][j]*u)):
-                normes_codes=norme_binaire(region_chiffres_bin[i],L_the[2][j]*u)
+            if (normes_codes>norme_binaire(region_chiffres_bin[i],L_the[2][j],u)):
+                normes_codes=norme_binaire(region_chiffres_bin[i],L_the[2][j],u)
                 decode[i]=int(j)
         normes_codes=len(region_chiffres_bin[0])
     return decode,r
@@ -161,7 +160,6 @@ def first_one(decode,r,tab):
     """ Retourne le premier chiffre """
     for i in range(0,len(tab)):
         if (r==tab[i]):
-            print("Premier chiffre : ", i)
             return i
     return "ERROR"
 
@@ -197,13 +195,11 @@ def main(x, y, img, seuil):
     # Binarisation
     xd,yd,xa,ya = find_lim(x1,y1,x2,y2,img,seuil)
     
-    """ A mettre dans le rapport 
     plt.figure()
     plt.imshow(img, cmap='gray')
     plt.plot([xd, xa], [yd, ya], 'ro-')
     plt.plot([x1, x2], [y1, y2], 'go-')
     plt.show()
-    """
     
     # Echantillonage + Binarisation de l'image après seuillage 
     segment_seuillage, u = find_u(xd,yd,xa,ya,img,seuil)
@@ -222,7 +218,7 @@ def main(x, y, img, seuil):
         print("Code barre valide : ", code_barre)
         return code_barre
     else:
-        print("Code barre invalide")
+        print("Code barre invalide : ", code_barre)
         return None  
 
 if __name__ == "__main__":
