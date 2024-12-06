@@ -43,8 +43,6 @@ def otsu(img, bins=255, displayHisto=False):
         wB += histogram_dic[k]
         sumB += (k-1) * histogram_dic[k] # A vérifier si c'est k ou k-1
     
-    print("Seuil optimal: ", level)
-    
     # Afficher l'histogramme
     if displayHisto:
         plt.figure()
@@ -74,95 +72,108 @@ def find_lim(x1,y1,x2,y2,img,seuil):
     valeurs_img=np.zeros((len(X), 1))
 
     for i in range(0,len(X)):
-        valeurs_img[i]=(img[Y[i], X[i]]) >= seuil
+        valeurs_img[i]=(img[Y[i], X[i]]) <= seuil
     i1=0
     i2=0
 
     for i in range(0,len(valeurs_img)):
-        if valeurs_img[i]==0:
+        if valeurs_img[i]==1:
             i1=i
             break
     for i in range(len(valeurs_img)-1,1,-1):
-        if valeurs_img[i]==0:
+        if valeurs_img[i]==1:
             i2=i
             break
     return X[i1],Y[i1],X[i2],Y[i2] # xd,yd,xa,ya
 
 def find_u(xd,yd,xa,ya,img,seuil):
     """On va prendre le multiple u et le signal binaire à analyser"""
-    nb_p=np.ceil(distance(xd,yd,xa,ya))
-    Nb_points=0
+    nb_p=np.ceil(distance(xd,yd,xa,ya)).astype(int) # Nombre de points L'
+    Nb_points=0 # u * 95
     u=0
-    while (Nb_points<nb_p):
+    while (Nb_points<=nb_p): # On cherche le plus petit u tq u * 95 > nb_p
         Nb_points+=95
         u+=1
+    
     X,Y=echantillonnage(xd,yd,xa,ya,Nb_points)
     valeurs_img=np.zeros((len(X), 1))
     
     for i in range(0,len(X)):
-        valeurs_img[i]=(img[Y[i], X[i]])>=seuil
-        
+        valeurs_img[i]=(img[Y[i], X[i]]) <= seuil
+    
+    plt.figure()
+    plt.imshow(img, cmap='gray')
+    for i in range(len(valeurs_img)):
+        if valeurs_img[i]: # Noir
+            plt.plot(X[i],Y[i],'r.')
+        else: # Blanc
+            plt.plot(X[i],Y[i],'b.')
+    plt.show()
+
     return valeurs_img,u #Echantillonnage et binarisation
 
-def separate(l_bin,u):
+def separate(segment_seuille,u):
     L=np.zeros((12,u*7))
-    start=3*u
+    start=3*u # Détermine les "gardes" (offset)
     for i in range(0,12):
         if (i==6):
             start=start+5*u
-        l_bin_temp = l_bin[start+i*7*u : start+(i+1)*7*u]
-        
-        
+        segment_seuille_temp = segment_seuille[start+i*7*u : start+(i+1)*7*u]
+
         for j in range(len(L[i])):
-            L[i,j] = l_bin_temp[j]
-        
+            L[i,j] = segment_seuille_temp[j,0]  
+
     return L
 
-def compare(L_exp,L_the,u):
-    min=len(L_exp[0])
-    decode=np.zeros((12, 1))
-    r="000000"
-    for i in range(0,len(L_exp)//2):
-        for j in range(0,len(L_the[0])):
-            if (min>sum(L_exp[i]!=("{0:b}".format(L_the[0][j]).zfill(7))*u)):
-                min=sum(L_exp[i]!=("{0:b}".format(L_the[0][j]).zfill(7))*u)
-                decode[i]=L_the[0][j]
-                r[i]='A'
-            if (min>sum(L_exp[i]!=("{0:b}".format(L_the[1][j]).zfill(7))*u)):
-                min=sum(L_exp[i]!=("{0:b}".format(L_the[1][j]).zfill(7))*u)
-                decode[i]=L_the[1,j]
-                r[i]='B'
-        min=len(L_exp[0])
+def norme_binaire(liste_binaire,chaine_binaire,u):
+    sum=0
+    for k in range(0,7):
+        for i in range(0,u):
+            sum+=(liste_binaire[k*u+i]!=int(chaine_binaire[k]))
+    return sum
 
-    for i in range(len(L_exp)//2,len(L_exp)):
+def compare(region_chiffres_bin,L_the,u):
+    normes_codes=len(region_chiffres_bin[0])
+    decode=np.zeros((12))
+    r=""
+    for i in range(0,6):
+        r_b=r
         for j in range(0,len(L_the[0])):
-            if (min>sum(L_exp[i]!=("{0:b}".format(L_the[2][j]).zfill(7))*u)):
-                min=sum(L_exp[i]!=("{0:b}".format(L_the[2][j]).zfill(7))*u)
-                decode[i]=L_the[2,j]
-        min=len(L_exp[0])
+            if (normes_codes>=norme_binaire(region_chiffres_bin[i],L_the[0][j],u)):
+                normes_codes=norme_binaire(region_chiffres_bin[i],L_the[0][j],u)
+                decode[i]=int(j)
+                r=r_b+"A"
+            if (normes_codes>=norme_binaire(region_chiffres_bin[i],L_the[1][j],u)):
+                normes_codes=norme_binaire(region_chiffres_bin[i],L_the[1][j],u)
+                decode[i]=int(j)
+                r=r_b+"B"
+        normes_codes=len(region_chiffres_bin[0])
+    for i in range(6,len(region_chiffres_bin)):
+        for j in range(0,len(L_the[0])):
+            if (normes_codes>=norme_binaire(region_chiffres_bin[i],L_the[2][j],u)):
+                normes_codes=norme_binaire(region_chiffres_bin[i],L_the[2][j],u)
+                decode[i]=int(j)
+        normes_codes=len(region_chiffres_bin[0])
     return decode,r
 
 def first_one(decode,r,tab):
+    """ Retourne le premier chiffre """
     for i in range(0,len(tab)):
         if (r==tab[i]):
-            decode=[i]+decode
-            return decode
+            return i
     return "ERROR"
 
 def clef_controle(decode):
     # Complément à 10 du dernier chiffre du code barre
-    complement = 10 - decode[-1]
+    complement = (10 - decode[-1]) % 10
     
-    # Somme des chiffres de rangs impairs
-    somme_impair = 0
-    for i in range(1, 12, 2): 
-        somme_impair += decode[i-1]
-
     # Somme des chiffres de rangs pairs
     somme_pair = 0
-    for i in range(2, 13, 2):
+    for i in range(1, len(decode), 2): 
         somme_pair += decode[i-1]
-    
+
+    # Somme des chiffres de rangs impairs
+    somme_impair = np.sum(decode) - somme_pair
     
     clef = (somme_impair + 3 * somme_pair) % 10
     return clef == complement
@@ -172,35 +183,40 @@ def main(x, y, img, seuil):
     y1 = y[0]
     x2 = x[1]
     y2 = y[1]
-    codage_chiffres = [[13,25,19,61,35,49,47,59,55,11],
-                       [43,51,27,33,29,57,5,17,9,23],
-                       [114,102,108,66,92,78,80,68,72,116]]
+    codage_chiffres_bin = [["0001101", "0011001", "0010011", "0111101", "0100011", "0110001", "0101111", "0111011", "0110111", "0001011"],
+                           ["0100111", "0110011", "0011011", "0100001", "0011101", "0111001", "0000101", "0010001", "0001001", "0010111"],
+                           ["1110010", "1100110", "1101100", "1000010", "1011100", "1001110", "1010000", "1000100", "1001000", "1110100"]]
     codage_premier_chiffre = ["AAAAAA","AABABB","AABBAB","AABBBA","ABAABB","ABBAAB","ABBBAA","ABABAB","ABABBA","ABBABA"]
     Nb=np.ceil(distance(x1, y1, x2, y2)).astype(int) # Nombre de points
-
-    # Echantillonnage
-    X, Y = echantillonnage(x1,y1,x2,y2,Nb)
     
     # Binarisation
     xd,yd,xa,ya = find_lim(x1,y1,x2,y2,img,seuil)
     
+    plt.figure()
+    plt.imshow(img, cmap='gray')
+    plt.plot([xd, xa], [yd, ya], 'ro-')
+    plt.plot([x1, x2], [y1, y2], 'go-')
+    plt.show()
+    
     # Echantillonage + Binarisation de l'image après seuillage 
-    img_seuillage, u = find_u(xd,yd,xa,ya,img,seuil)
-
-    regions_chiffres_bin = separate(img_seuillage,u)
+    segment_seuillage, u = find_u(xd,yd,xa,ya,img,seuil)
+    regions_chiffres_bin = separate(segment_seuillage,u)
     
     # Décodage des regions binaires
-    regions_chiffres, sequence_AB = compare(regions_chiffres_bin,codage_chiffres,u)
+    regions_chiffres, sequence_AB = compare(regions_chiffres_bin,codage_chiffres_bin,u)
+    print(regions_chiffres,sequence_AB)
     
     # Ajout du premier chiffre
-    regions_chiffres = first_one(regions_chiffres,sequence_AB,codage_premier_chiffre)
+    premier_chiffre = first_one(regions_chiffres,sequence_AB,codage_premier_chiffre)
+    code_barre = np.append(premier_chiffre, regions_chiffres)
     
     # Vérification de la clé de contrôle
-    if clef_controle(regions_chiffres):
-        print("Code barre valide : ", regions_chiffres)
-        return regions_chiffres
+    if clef_controle(code_barre):
+        print("Code barre valide : ", code_barre)
+        return code_barre
     else:
-        print("Code barre invalide")
+        print("Code barre invalide : ", code_barre)
+        return None  
 
 if __name__ == "__main__":
     img = cv2.imread('code_barre.png', cv2.IMREAD_GRAYSCALE)
@@ -212,23 +228,6 @@ if __name__ == "__main__":
     width  = img.shape[1]
     
     x = [10, width-10]
-    y = [10, height-10]
+    y = [height//2, height//2]
     
     main(x, y, img, seuil)
-
-
-codage_chiffres_bin = [["0001101", "0011001", "0010011", "0111101", "0100011", "0110001", "0101111", "0111011", "0110111", "0001011"]
-                   ["0100111", "0110011", "0011011", "0100001", "0011101", "0111001", "0000101", "0010001", "0001001", "0010111"]
-                   ["1110010", "1100110", "1101100", "1000010", "1011100", "1001110", "1010000", "1000100", "1001000", "1110100"]]
-
-"""
-x1=2
-x2=5
-y1=9
-y2=6
-Nb=np.ceil(distance(x1, y1, x2, y2)).astype(int)
-X,Y=echantillonnage(x1,y1,x2,y2,Nb)
-print(X,Y)
-codage_chiffres = [[13,25,19,61,35,49,47,59,55,11],[43,51,27,33,29,57,5,17,9,23],[114,102,108,66,92,78,80,68,72,116]]
-codage_premier_chiffre = ["AAAAAA","AABABB","AABBAB","AABBBA","ABAABB","ABBAAB","ABBBAA","ABABAB","ABABBA","ABBABA"]
-"""
