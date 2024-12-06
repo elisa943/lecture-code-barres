@@ -165,18 +165,15 @@ def first_one(decode,r,tab):
 
 def clef_controle(decode):
     # Complément à 10 du dernier chiffre du code barre
-    complement = 10 - decode[-1]
+    complement = (10 - decode[-1]) % 10
     
-    # Somme des chiffres de rangs impairs
-    somme_impair = 0
-    for i in range(1, 12, 2): 
-        somme_impair += decode[i-1]
-
     # Somme des chiffres de rangs pairs
     somme_pair = 0
-    for i in range(2, 13, 2):
+    for i in range(1, len(decode), 2): 
         somme_pair += decode[i-1]
-    
+
+    # Somme des chiffres de rangs impairs
+    somme_impair = np.sum(decode) - somme_pair
     
     clef = (somme_impair + 3 * somme_pair) % 10
     return clef == complement
@@ -234,16 +231,3 @@ if __name__ == "__main__":
     y = [height//2, height//2]
     
     main(x, y, img, seuil)
-
-
-"""
-x1=2
-x2=5
-y1=9
-y2=6
-Nb=np.ceil(distance(x1, y1, x2, y2)).astype(int)
-X,Y=echantillonnage(x1,y1,x2,y2,Nb)
-print(X,Y)
-codage_chiffres = [[13,25,19,61,35,49,47,59,55,11],[43,51,27,33,29,57,5,17,9,23],[114,102,108,66,92,78,80,68,72,116]]
-codage_premier_chiffre = ["AAAAAA","AABABB","AABBAB","AABBBA","ABAABB","ABBAAB","ABBBAA","ABABAB","ABABBA","ABBABA"]
-"""
