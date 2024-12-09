@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 from math import floor, sqrt
 class Blob:
-    def __init__(self, pixels=None,X=None,Y=None, barycentre=None, valeurs_propres=None, vecteurs_propres=None,area=None):
+    def __init__(self, pixels=None,X=None,Y=None, barycentre=None, valeurs_propres=None, vecteurs_propres=None,area=None,axis=None):
         self.pixels = pixels 
         self.X = X
         self.Y = Y 
@@ -14,6 +14,7 @@ class Blob:
         self.valeurs_propres = valeurs_propres 
         self.vecteurs_propres = vecteurs_propres 
         self.area=area
+        self.axis=axis
     def calc_XY(self):
         self.X,self.Y=self.pixels[:,0],self.pixels[:,1]
         return self.X,self.Y
@@ -26,10 +27,7 @@ class Blob:
         return self.valeurs_propres,self.vecteurs_propres
     def calc_area(self):
         self.area=self.pixels.size # not the real area, but a good measure of how large it is
-        return
-    def calc_axis(self):
-        
-        return
+        return self.area
     def calc_all(self):
         try:
             self.calc_XY()
@@ -42,9 +40,12 @@ class Blob:
         
     def calc_axis(self):
         self.calc_all()
-        p1 = floor(self.barycentre[1]+self.valeurs_propres[0]/2*self.vecteurs_propres[0][0]), floor(self.barycentre[0]+self.valeurs_propres[0]/2*self.vecteurs_propres[0][1])
-        p2 = floor(self.barycentre[1]-self.valeurs_propres[0]/2*self.vecteurs_propres[0][0]), floor(self.barycentre[0]-self.valeurs_propres[0]/2*self.vecteurs_propres[0][1])
-        return p1,p2
+        if self.axis==None:
+            p1 = floor(self.barycentre[1]+self.valeurs_propres[0]/2*self.vecteurs_propres[0][0]), floor(self.barycentre[0]+self.valeurs_propres[0]/2*self.vecteurs_propres[0][1])
+            p2 = floor(self.barycentre[1]-self.valeurs_propres[0]/2*self.vecteurs_propres[0][0]), floor(self.barycentre[0]-self.valeurs_propres[0]/2*self.vecteurs_propres[0][1])
+            self.axis=[p1,p2]
+        return self.axis
+        
         
     # @property
     def __repr__(self):
