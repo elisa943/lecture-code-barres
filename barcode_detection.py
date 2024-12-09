@@ -99,6 +99,23 @@ def barcode_detection(img_code_barre,sigma_g,sigma_t,seuil,sigma_bruit=2,afficha
     Blobs=[Blob(pixels=x.coords) for x in blobs]
     axis=[b.calc_axis() for b in Blobs]
     #============================================================================================================
+    plt.figure(0)
+    plt.subplot(1, 2, 1)
+    plt.imshow(img_code_barre)
+    plt.title("img origine")
+    plt.subplot(1, 2, 2)
+    plt.imshow(D_labeled, cmap=cm.BrBG_r)
+    for blob in Blobs:
+        assert(blob.axis!=None)
+        a,b=blob.axis
+        p=blob.barycentre
+        plt.plot(p[1],p[0],"or",markersize=2.5)
+        plt.plot(a[0],a[1],"+b",markersize=5)
+        plt.plot(b[0],b[1],"+b",markersize=5)
+    plt.title("img labelisee")
+    plt.colorbar()
+    # aff=[b.__repr__() for b in Blobs]
+    # plt.show()
     if affichage:
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Affichage ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -173,14 +190,14 @@ img_code_barre="img/code_barre_prof.jpg"
 sigma_bruit =1
 
 # Pour le gradient, relativement faible pour trouver les vecteurs de transition correspondant aux barres
-sigma_g = 1
+sigma_g =1
 
 # Pour le tenseur, relativement élevé pour trouer des clusters de vecteurs gradient
 sigma_t = 15
 
 seuil = 0.7 
 
-u=barcode_detection(img_code_barre,sigma_g,sigma_t,seuil,sigma_bruit=2,affichage=True)
+u=barcode_detection(img_code_barre,sigma_g,sigma_t,seuil,sigma_bruit=2,affichage=False)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Fonctions tracé de rayons ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # %%

@@ -25,7 +25,7 @@ class Blob:
         # self.calc_XY() if (None in [self.X,self.Y]) else print("X,Y déjà définis")
         self.valeurs_propres,self.vecteurs_propres=np.linalg.eig(np.cov(self.X,self.Y))
         return self.valeurs_propres,self.vecteurs_propres
-    def calc_area(self):
+    def calc_area(self): # pour éventuellement appliquer un critère de sélaction surla taille du bousin
         self.area=self.pixels.size # not the real area, but a good measure of how large it is
         return self.area
     def calc_all(self):
