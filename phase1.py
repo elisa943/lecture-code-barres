@@ -101,6 +101,7 @@ def find_u(xd,yd,xa,ya,img,seuil):
     for i in range(0,len(X)):
         valeurs_img[i]=(img[Y[i], X[i]]) <= seuil
     
+    """
     plt.figure()
     plt.imshow(img, cmap='gray')
     for i in range(len(valeurs_img)):
@@ -108,7 +109,8 @@ def find_u(xd,yd,xa,ya,img,seuil):
             plt.plot(X[i],Y[i],'r.')
         else: # Blanc
             plt.plot(X[i],Y[i],'b.')
-    plt.show()
+    plt.show()    
+    """
 
     return valeurs_img,u #Echantillonnage et binarisation
 
@@ -161,24 +163,17 @@ def first_one(decode,r,tab):
     for i in range(0,len(tab)):
         if (r==tab[i]):
             return i
-    return "ERROR"
+    return None
 
 def clef_controle(decode):
     # Complément à 10 du dernier chiffre du code barre
     complement = (10 - decode[-1]) % 10
-    
-    # Somme des chiffres de rangs pairs
-    somme_pair = 0
-    for i in range(1, len(decode), 2): 
-        somme_pair += decode[i-1]
 
-    # Somme des chiffres de rangs impairs
-    somme_impair = np.sum(decode) - somme_pair
-    
-    clef = (somme_impair + 3 * somme_pair) % 10
+    L = [1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3]
+    clef = np.sum(decode[0:-1] * L) % 10
     return clef == complement
 
-def main(x, y, img, seuil):
+def phase1(x, y, img, seuil):
     x1 = x[0]
     y1 = y[0]
     x2 = x[1]
@@ -191,12 +186,14 @@ def main(x, y, img, seuil):
     
     # Binarisation
     xd,yd,xa,ya = find_lim(x1,y1,x2,y2,img,seuil)
-    
+
+    """
     plt.figure()
     plt.imshow(img, cmap='gray')
     plt.plot([xd, xa], [yd, ya], 'ro-')
     plt.plot([x1, x2], [y1, y2], 'go-')
     plt.show()
+    """
     
     # Echantillonage + Binarisation de l'image après seuillage 
     segment_seuillage, u = find_u(xd,yd,xa,ya,img,seuil)
@@ -204,10 +201,13 @@ def main(x, y, img, seuil):
     
     # Décodage des regions binaires
     regions_chiffres, sequence_AB = compare(regions_chiffres_bin,codage_chiffres_bin,u)
-    print(regions_chiffres,sequence_AB)
     
     # Ajout du premier chiffre
     premier_chiffre = first_one(regions_chiffres,sequence_AB,codage_premier_chiffre)
+    
+    if (premier_chiffre == None):
+        return None
+    
     code_barre = np.append(premier_chiffre, regions_chiffres)
     
     # Vérification de la clé de contrôle
@@ -216,18 +216,4 @@ def main(x, y, img, seuil):
         return code_barre
     else:
         print("Code barre invalide : ", code_barre)
-        return None  
-
-if __name__ == "__main__":
-    img = cv2.imread('code_barre.png', cv2.IMREAD_GRAYSCALE)
-    
-    # Seuillage avec la méthode d'Otsu
-    seuil = otsu(img)
-    
-    height = img.shape[0]
-    width  = img.shape[1]
-    
-    x = [10, width-10]
-    y = [height//2, height//2]
-    
-    main(x, y, img, seuil)
+        return None 
