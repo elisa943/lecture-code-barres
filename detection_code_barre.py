@@ -55,15 +55,16 @@ def bornage(h, w, p): # à voir si une accélération est possible
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ PARAMETRES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # %%
+
 # Pour le bruit, à regler à la main
-sigma_bruit =3
+sigma_bruit =1
 
 # Pour le gradient, relativement faible pour trouver les vecteurs de transition correspondant aux barres
 sigma_g = 1
 
 
 # Pour le tenseur, relativement élevé pour trouer des clusters de vecteurs gradient
-sigma_t = 10*sigma_g
+sigma_t = 15
 
 seuil = 0.7
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Préparation de l'image ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -146,7 +147,7 @@ class Blob:
         self.barycentre = barycentre 
         self.valeurs_propres = valeurs_propres 
         self.vecteurs_propres = vecteurs_propres 
-        self.area
+        self.area=area
     def calc_XY(self):
         self.X,self.Y=self.pixels[:,0],self.pixels[:,1]
         return self.X,self.Y
@@ -172,95 +173,56 @@ class Blob:
         except Exception as e:
             print(e)
             return False
+        
+    def calc_axis(self):
+        self.calc_all()
+        p1 = floor(self.barycentre[1]+self.valeurs_propres[0]/2*self.vecteurs_propres[0][0]), floor(self.barycentre[0]+self.valeurs_propres[0]/2*self.vecteurs_propres[0][1])
+        p2 = floor(self.barycentre[1]-self.valeurs_propres[0]/2*self.vecteurs_propres[0][0]), floor(self.barycentre[0]-self.valeurs_propres[0]/2*self.vecteurs_propres[0][1])
+        return p1,p2
+        
+    # @property
     def __repr__(self):
+        plt.figure()
+        p1,p2 = self.calc_axis()
+        plt.imshow(self.pixels)
+        k=2
+        h=floor((max(self.Y)+1-min(self.Y))*k)
+        w=floor((max(self.X)+1-min(self.X))*k)
+        I=np.zeros((w,h))
+        # I[self.barycentre[0]-min(self.X)+floor(w/4),self.barycentre[1]-min(self.Y)+floor(h/4)]=3
+        # affichage du Blob
+        I[self.X-min(self.X)+floor(w/4),self.Y-min(self.Y)+floor(h/4)]=1
         
-        return 
+        # Affichage des points de l'axe
+        a,b=p1[1]-min(self.X)+floor(w/4),p1[0]-min(self.Y)+floor(h/4)
+        c,d=p2[1]-min(self.X)+floor(w/4),p2[0]-min(self.Y)+floor(h/4)
         
+        I[p1[1]-min(self.X)+floor(w/4),p1[0]-min(self.Y)+floor(h/4)]=5
+        I[p2[1]-min(self.X)+floor(w/4),p2[0]-min(self.Y)+floor(h/4)]=5
+        # barycentre
+        I[floor(w/2),floor(h/2)]=3
+        plt.imshow(I,cmap=cm.hot)
+        plt.colorbar()
+        return str("Plot du Blob")
+    
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Labelisation ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 D_labeled,num_labels=measure.label(D_seuil,return_num=True)
 blobs=measure.regionprops(D_labeled)
 print(f"{num_labels} objects detected in img")
 coords=[x.coords for x in blobs]
 
-# # en implémentant la classe:
-# Blobs=[Blob(pixels=x.coords) for x in blobs]
-# print(False not in [b.calc_all() for b in Blobs])
+# en implémentant la classe:
+Blobs=[Blob(pixels=x.coords) for x in blobs]
+axis=[b.calc_axis() for b in Blobs]
 
-# Sans implémentation de la classe Blob:
-coords=coords[1:] #on ignore le fond (premier label)
-X_blobs=[blobpixels[:,0] for blobpixels in coords]
-Y_blobs=[blobpixels[:,1] for blobpixels in coords]
-barycentres=[np.mean(x,axis=0) for x in coords] 
-
-matrices_cov=[np.cov(X_blobs[i],Y_blobs[i]) for i in range(len(X_blobs))]
-valeurs_propres=[0 for i in range(len(matrices_cov))] 
-vecteurs_propres=[0 for i in range(len(matrices_cov))]
-for i,M in enumerate(matrices_cov):
-    valeurs_propres[i],vecteurs_propres[i]=np.linalg.eig(M)
 #print(barycentres)
-print("valeur propres")
-print(valeurs_propres)
-print("vecteur propre")
-print(vecteurs_propres[0])
+# print("valeur propres")
+# print(valeurs_propres)
+# print("vecteur propre")
+# print(vecteurs_propres[0])
 
-plt.figure(0)
-plt.subplot(1, 2, 1)
-plt.imshow(img_code_barre)
-plt.title("img origine")
-plt.subplot(1, 2, 2)
-plt.imshow(D_labeled, cmap=cm.BrBG_r)
-for p in barycentres:
-    plt.plot(p[1],p[0],"or",markersize=5)
-# plt.plot(400,400,"or")
-pt_interet=[]
-for j in range(len(barycentres)):
-    pt_interet.append([[barycentres[j][1]+valeurs_propres[j][0]/2*vecteurs_propres[j][0][0],barycentres[j][0]+valeurs_propres[j][0]/2*vecteurs_propres[j][0][1]],[barycentres[j][1]-valeurs_propres[j][0]/2*vecteurs_propres[j][0][0],barycentres[j][0]-valeurs_propres[j][0]/2*vecteurs_propres[j][0][1]]])
-
-for p in pt_interet:
-    p[0]=bornage(h,w,p[0])
-    p[1]=bornage(h,w,p[1])
-    plt.plot(p[0][0],p[0][1],"ob",markersize=5)
-    plt.plot(p[1][0],p[1][1],"ob",markersize=5)
-plt.colorbar()
-plt.title("img labelisee")
-
-i0,i1=(0,1)
-Ratios=[v[i1]/v[i0] for v in valeurs_propres]
-mx=max(Ratios)
-best_fit=[i for i,e in enumerate(Ratios) if e==mx]
-assert(len(best_fit)==1)
-
-final_blob=best_fit[0]
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Affichage ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# %%
-# print("Affichage...")
-# plot_channels([img_code_barre, D_seuil])
-
-# plot_channels([img_code_barre, D_res, D_seuil, D_seuil_closed], 
-#               titles=["image originale", "mesure de cohérence", "image seuilée", "Image après Fermeture"], 
-#               res_factor=2)
-
-# plot_channels([img_code_barre, img_code_barre_YCbCr[:, :, 0]], 
-#               titles=["img origine", "img canal Y"], 
-#               res_factor=2)
-
-# plot_channels([I_x, I_y], 
-#               titles=["grad x", "grad y"], 
-#               res_factor=2)
-
-# plot_channels([N_I_x, N_I_y], 
-#               titles=["normalisé grad x", "normalisé grad y"], 
-#               res_factor=2)
-
-# plot_channels([Txx, Tyy, Txy], 
-#               titles=["Txx", "Tyy", "Txy"], 
-#               res_factor=2)
-
-# plot_channels([D_res, D_seuil], 
-#               titles=["D", "D seuil"], 
-#               res_factor=2)
-
-# plt.show()
 
 plt.figure(1)
 plt.subplot(1, 2, 1)
@@ -311,10 +273,15 @@ plt.imshow(img_code_barre)
 plt.title("img origine")
 plt.subplot(1, 2, 2)
 plt.imshow(D_labeled, cmap=cm.BrBG_r)
-for p in barycentres:
-    plt.plot(p[1],p[0],"or",markersize=5)
-# plt.plot(400,400,"or")
+for blob in Blobs:
+    a,b=blob.calc_axis()
+    p=blob.barycentre
+    plt.plot(p[1],p[0],"or",markersize=2.5)
+    plt.plot(a[0],a[1],"+b",markersize=5)
+    plt.plot(b[0],b[1],"+b",markersize=5)
 plt.title("img labelisee")
+
+affichage=[b.__repr__() for b in Blobs]
 
 plt.show() # rajoute plus d'une seconde à l'exécution, pourquoi?
 
