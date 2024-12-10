@@ -18,6 +18,52 @@
 \usepackage{amsmath} % For \genfrac
 \usepackage{amssymb} % pour \lessgtr
 \usepackage{comment} 
+\usepackage{multicol} % Pour les colonnes
+\usepackage{listings}
+\usepackage{courier}
+
+\definecolor{backcolour}{RGB}{47,47,47}
+\definecolor{violet}{RGB}{200,20,200}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{marron}{RGB}{150,100,70}
+\definecolor{red2}{RGB}{207,43,58}
+\definecolor{bordeaux}{RGB}{74,31,30}
+\lstdefinestyle{mystyle}{
+    language=Python,
+    basicstyle=\tiny\ttfamily
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{violet},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{red},
+    literate={,}{{\textcolor{red}{,}}}1
+             {;}{{\textcolor{red}{;}}}1,
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2,
+    literate=
+  {á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+  {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
+  {à}{{\`a}}1 {è}{{\`e}}1 {ì}{{\`i}}1 {ò}{{\`o}}1 {ù}{{\`u}}1
+  {À}{{\`A}}1 {È}{{\'E}}1 {Ì}{{\`I}}1 {Ò}{{\`O}}1 {Ù}{{\`U}}1
+  {ä}{{\"a}}1 {ë}{{\"e}}1 {ï}{{\"i}}1 {ö}{{\"o}}1 {ü}{{\"u}}1
+  {Ä}{{\"A}}1 {Ë}{{\"E}}1 {Ï}{{\"I}}1 {Ö}{{\"O}}1 {Ü}{{\"U}}1
+  {â}{{\^a}}1 {ê}{{\^e}}1 {î}{{\^i}}1 {ô}{{\^o}}1 {û}{{\^u}}1
+  {Â}{{\^A}}1 {Ê}{{\^E}}1 {Î}{{\^I}}1 {Ô}{{\^O}}1 {Û}{{\^U}}1
+  {œ}{{\oe}}1 {Œ}{{\OE}}1 {æ}{{\ae}}1 {Æ}{{\AE}}1 {ß}{{\ss}}1
+  {ű}{{\H{u}}}1 {Ű}{{\H{U}}}1 {ő}{{\H{o}}}1 {Ő}{{\H{O}}}1
+  {ç}{{\c c}}1 {Ç}{{\c C}}1 {ø}{{\o}}1 {å}{{\r a}}1 {Å}{{\r A}}1
+  {€}{{\EUR}}1 {£}{{\pounds}}1
+}
 
 \title{TS229}
 \begin{document}
@@ -46,6 +92,16 @@
 % ------------------------------------------------ %
 
 \section{Introduction}
+
+\section {Phase 1 : Détection du code barre}
+
+
+
+\section{Phase 2 : Lecture du code barre}
+
+
+
+\section{Mise en commun des deux phases}
 
 \section{Bilan de l'organisation}
 
@@ -107,6 +163,69 @@
 
 \subsection{Séance 5} % 13 Décembre 
 
+\newpage
+
 \section{Annexes}
+
+\lstset{style=mystyle}
+
+\subsection{Méthode d'Otsu}
+\begin{multicols}{2}
+	\begin{lstlisting}
+		def otsu(img, bins=255, displayHisto=False):
+		luminance = None
+		
+		# Si l'image est en couleur (3 dimensions)
+		if len(img.shape) == 3 and img.shape[2] > 1:
+			# Calcul de la luminance 
+			luminance = np.array([[(img[i][j][0] + img[i][j][1] + img[i][j][2])//3 for j in range(img.shape[1])] for i in range(img.shape[0])])
+			luminance = luminance.ravel()
+		else:
+			luminance = img.ravel()
+		
+		# Création de l'histogramme
+		histogram, bin_edges = np.histogram(luminance.ravel(), range=(0, 255), bins=bins)
+		
+		# Moyenner l'histogramme
+		histogram = histogram/sum(histogram)    
+		
+		# Création d'un dico pour associer chaque valeur de luminance à sa fréquence
+		histogram_dic = {int(bin_edges[i]): histogram[i] for i in range(len(histogram))}
+		
+		# Initialisation des moyennes et poids initiaux
+		n = len(histogram_dic)
+		sumB = 0
+		wB = 0
+		maximum = 0.0
+		sum1 = sum(i * histogram_dic[i] for i in range(n))
+		total = sum(histogram_dic.values())
+		level = 0
+		for k in range(1, n):
+			wF = total - wB
+			if wB > 0 and wF > 0:
+				mF = (sum1 - sumB) / wF
+				val = wB * wF * (sumB / wB - mF) * (sumB / wB - mF)
+				
+				if val >= maximum:
+					level = k
+					maximum = val
+			
+			wB += histogram_dic[k]
+			sumB += (k-1) * histogram_dic[k]
+		
+		# Afficher l'histogramme
+		if displayHisto:
+			plt.figure()
+			plt.hist(luminance, bins=bins, range=(0, 255))
+			plt.axvline(level, color='r')
+			plt.title("Histogramme de la luminance")
+			plt.xlabel("Luminance")
+			plt.ylabel("Fréquence")
+			plt.show()
+		
+		return level
+	
+	\end{lstlisting}
+\end{multicols}
 
 \end{document}
