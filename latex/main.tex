@@ -14,9 +14,6 @@
 \usepackage[hidelinks]{hyperref} % For URL links (no box or color name) 
 
 %Ce que moi(Alban) ai rajouté comme package
-\usepackage{amsfonts} % For math sign like Z
-\usepackage{amsmath} % For \genfrac
-\usepackage{amssymb} % pour \lessgtr
 \usepackage{comment} 
 \usepackage{multicol} % Pour les colonnes
 \usepackage{listings}
@@ -95,9 +92,51 @@
 
 \section {Phase 1 : Détection du code barre}
 
-
-
 \section{Phase 2 : Lecture du code barre}
+
+Nous supposons recevoir en paramètres deux couples de points représentants un rayon de la phase précédente. 
+
+\subsection{Détermination des limites du code-barres}
+
+Le rayon initial traverse potentiellement des zones inutiles de l'image. Il est donc essentiel de réduire ce segment pour que ses extrémités coïncident avec les bords du code-barres (les premières barres noires détectées).  
+Cette étape est réalisée en échantillonnant l’image le long du segment défini, puis en appliquant un seuil de binarisation. Ce seuil est calculé grâce à l’algorithme d’Otsu.  
+
+
+\subsection{Binarisation de l'image}
+
+Prenons l'image suivante :
+
+\begin{figure}[H] % Ajouter les deux points reçu en argument 
+	\centering
+	\includegraphics[width=0.5\textwidth]{images/barcode0.jpg}
+	\caption{Image du code barre}
+	\label{fig:barcode}
+\end{figure}
+
+La première étape de cette phase est de réduire ce rayon, de sorte que les deux nouveaux points correspondent à la première barre noire du code barre.
+
+\begin{figure}[H] 
+	\centering
+	\includegraphics[width=0.5\textwidth]{images/histogramme.png}
+	\caption{Image du code barre}
+	\label{fig:histo}
+\end{figure}
+
+
+\begin{figure}[H] 
+	\centering
+	\includegraphics[width=0.5\textwidth]{images/binarisation.png}
+	\caption{Délimitation}
+	\label{fig:binarisation}
+\end{figure}
+
+\begin{figure}[H] 
+	\centering
+	\includegraphics[width=0.5\textwidth]{images/detection.png}
+	\caption{Détection du noir et blanc}
+	\label{fig:detection}
+\end{figure}
+
 
 
 
@@ -107,7 +146,7 @@
 
 \subsection{Séance 1}
 
-\begin{table}[h]
+\begin{table}[htbp]
 	\centering 
 	\begin{tabular}{c|c|c}
 		& Tâches entreprises& Temps passé\\ \hline
@@ -121,7 +160,7 @@
 
 \subsection{Séance 2}
 
-\begin{table}[h]
+\begin{table}[htbp]
 	\centering 
 	\begin{tabular}{c|c|c}
 		& Tâches entreprises& Temps passé\\ \hline
@@ -135,7 +174,7 @@
 
 \subsection{Séance 3}
 
-\begin{table}[h]
+\begin{table}[htbp]
 	\centering 
 	\begin{tabular}{c|c|c}
 		& Tâches entreprises& Temps passé\\ \hline
@@ -149,7 +188,7 @@
 
 \subsection{Séance 4}
 
-\begin{table}[h]
+\begin{table}[htbp]
 	\centering 
 	\begin{tabular}{c|c|c}
 		& Tâches entreprises& Temps passé\\ \hline
