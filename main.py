@@ -1,4 +1,5 @@
 from phase1 import *
+from barcode_detection import barcode_detection
 
 def main():
     # Détection des barres
