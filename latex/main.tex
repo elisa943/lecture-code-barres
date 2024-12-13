@@ -108,6 +108,21 @@ Le seuil optimal est celui qui maximise la variance inter-classe, assurant ainsi
 En pratique, le seuil calculé devrait se situer entre les deux pics de l'histogramme.
 
 \subsubsection*{Détermination des limites du code-barres}
+La première étape de cette phase est de réduire ce rayon, de sorte que les deux nouveaux points correspondent à la première barre noire du code barre.
+Pour cela, nous devons tout d'abord opérer un seuillage de l'image grâce au seuil donné par l'algorithme d'otsu.
+Le segment est alors échantilloné en prenant le plus proches voisins. 
+Cet ensemble de points va alors être binarisé grâce au seuil. C'est à dire que les points de valeurs inférieures au seuil vont valoir 1 et les autres vont valoir 0
+
+Les points déterminant le début et la fin du code-barres sont ensuite déterminés en prenant le premier et dernier point de valeur 0
+
+Finalement un dernier échantillonnage suivi d'une binarisation sur le même seuil permet de trouver la liste binaire à analyser. Cette liste devant être compatible avec les hypotheses de données auxquelles nous allons le comparer, la binarisation ce fera dans le sens contraire de la première.
+C'est à dire que les points de valeurs inférieures au seuil vont valoir 0 tandis que les autres vont valoir 0.
+Le nombre de point échantillonnés est calculé en prenant $N=u*95$ avec u le plus petit multiple de 95 tel que u*95>L la longueur du segment du code barre
+
+\subsubsection{Analyse du code barre binaire}
+La prochaine étape consiste à séparer les différents blocs contenu dans la liste binaire obtenu précédemment en ne gardant que ceux représentant des nombres
+Pour décoder chaque blocs, ils font être comparé avec des données de décodage en adaptant celle-ci à la taille du bloc 
+Le choix se fera en prenant la plus petit norme entre le bloc et les données comparés.
 \subsubsection*{Détermination du dernier chiffre du code barre}
 
 À partir des six premières valeurs obtenues, nous pouvons déterminer le premier chiffre. 
@@ -180,14 +195,6 @@ De manière générale, il faut tout de même vérifier la validité du code bar
 En l'occurrence, le complément à 10 du dernier chiffre du code barre vaut 0, tandis que le chiffre des unités de la somme des chiffres de rang impair et trois fois la somme des chiffres de rang pair vaut 0. 
 Le code barre est donc valide.
 
-\section{A ENLEVER : Phase 2 : Lecture du code barre}
-
-\subsection{Seuillage de l'image avec Otsu}
-\subsection{Détermination des limites du code-barres}
-
-Le rayon initial traverse potentiellement des zones inutiles de l'image. Il est donc essentiel de réduire ce segment pour que ses extrémités coïncident avec les bords du code-barres (les premières barres noires détectées).  
-Cette première étape est réalisée en échantillonnant l’image le long du segment défini, puis en appliquant un seuil de binarisation. Ce seuil est calculé grâce à l’algorithme d’Otsu.  
-
 % Afficher l'image avec les deux points reçu en argument
 \begin{figure}[H] % Ajouter les deux points reçu en argument 
 	\centering
@@ -195,10 +202,6 @@ Cette première étape est réalisée en échantillonnant l’image le long du s
 	\caption{Segment défini par le deux points en arguments}
 \end{figure}
 
-La première étape de cette phase est de réduire ce rayon, de sorte que les deux nouveaux points correspondent à la première barre noire du code barre.
-Pour cela, nous devons tout d'abord opérer un seuillage de l'image grâce au seuil donné par l'algorithme d'otsu.
-Le segment est alors échantilloné en prenant le plus proches voisins. 
-Cet ensemble de points va alors être binarisé grâce au seuil.
 
 \begin{figure}[H] 
 	\centering
@@ -207,7 +210,6 @@ Cet ensemble de points va alors être binarisé grâce au seuil.
 	\label{fig:binarisation}
 \end{figure}
 
-Les points déterminant le début et la fin du code-barres sont ensuite déterminés en prenant le premier et dernier point de valeur 0
 
 \begin{figure}[H] 
 	\centering
@@ -216,13 +218,6 @@ Les points déterminant le début et la fin du code-barres sont ensuite détermi
 	\label{fig:detection}
 \end{figure}
 
-Finalement un dernier échantillonnage suivi d'une binarisation sur le même seuil permet de trouver la liste binaire à analyser
-Le nombre de point échantillonnés est calculé en prenant $N=u*95$ avec u le plus petit multiple de 95 tel que u*95>L la longueur du segment du code barre
-
-\subsection{Analyse du code barre binaire}
-La prochaine étape consiste à séparer les différents blocs contenu dans la liste binaire obtenu précédemment en ne gardant que ceux représentant des nombres
-Pour décoder chaque blocs, ils font être comparé avec des données de décodage en adaptant celle-ci à la taille du bloc 
-Le choix se fera en prenant la plus petit norme entre le bloc et les données comparés. 
 
 \subsection{Détermination du dernier chiffre du code barre}
 
@@ -232,7 +227,7 @@ Le choix se fera en prenant la plus petit norme entre le bloc et les données co
 
 \subsection{Séance 1}
 
-\begin{table}[htbp]
+\begin{table}[H]
 	\centering 
 	\begin{tabular}{c|c|c}
 		& Tâches entreprises& Temps passé\\ \hline
@@ -246,12 +241,12 @@ Le choix se fera en prenant la plus petit norme entre le bloc et les données co
 
 \subsection{Séance 2}
 
-\begin{table}[htbp]
+\begin{table}[H]
 	\centering 
 	\begin{tabular}{c|c|c}
 		& Tâches entreprises& Temps passé\\ \hline
 		Elisa& Finition de la méthode d'Otsu & 2h\\ \hline
-		Alban& & \\ \hline
+		Alban& Complétion de l'échantillonnage et de la binarisation, début du calcul des limites du code-barres et de la recherche de u& 2h\\ \hline
 		Tierno& & \\ \hline
 		David& & 
 	\end{tabular}
@@ -260,12 +255,12 @@ Le choix se fera en prenant la plus petit norme entre le bloc et les données co
 
 \subsection{Séance 3}
 
-\begin{table}[htbp]
+\begin{table}[H]
 	\centering 
 	\begin{tabular}{c|c|c}
 		& Tâches entreprises& Temps passé\\ \hline
 		Elisa& Débuggage et mise en commun de toutes les fonctions de la phase 1 & 3h\\ \hline
-		Alban& & \\ \hline
+		Alban& Débuggage des fonctions de décodage des blocs fait chez soi et mise en commun du travail phase1& 3h\\ \hline
 		Tierno& & \\ \hline
 		David& & 
 	\end{tabular}
@@ -274,12 +269,12 @@ Le choix se fera en prenant la plus petit norme entre le bloc et les données co
 
 \subsection{Séance 4}
 
-\begin{table}[htbp]
+\begin{table}[H]
 	\centering 
 	\begin{tabular}{c|c|c}
 		& Tâches entreprises& Temps passé\\ \hline
 		Elisa& & \\ \hline
-		Alban& & \\ \hline
+		Alban& Dernier débuggage et test sur des exemples pour vérifier l'efficacité du code& 3h\\ \hline
 		Tierno& & \\ \hline
 		David& & 
 	\end{tabular}
