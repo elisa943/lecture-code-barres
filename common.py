@@ -24,8 +24,6 @@ def bornage2(h,w,ray):
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Fonctions tracé de rayons ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # %%
-
-
 # ajouter des paramètres pour avoir un tirage gaussien (ou autre)
 
 def ray_center(center,length,angle):
@@ -37,8 +35,7 @@ def ray_center(center,length,angle):
     angle : float
     crée un rayon de centre center, de longueur length et d'angle alpha (par rapport à l'horizontale)
     """
-    r = length/2
-    offset = np.array([np.cos(angle), np.sin(angle)])*r
+    offset = np.array([np.cos(angle), np.sin(angle)])*length/2
     x1 = center+offset
     x2 = center-offset
     return np.array([x1,x2])
