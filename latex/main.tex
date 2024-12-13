@@ -113,7 +113,8 @@ Pour cela, nous devons tout d'abord opérer un seuillage de l'image grâce au se
 Le segment est alors échantilloné en prenant le plus proches voisins. 
 Cet ensemble de points va alors être binarisé grâce au seuil. C'est à dire que les points de valeurs inférieures au seuil vont valoir 1 et les autres vont valoir 0
 
-Les points déterminant le début et la fin du code-barres sont ensuite déterminés en prenant le premier et dernier point de valeur 0
+Les points déterminant le début et la fin du code-barres sonclear
+t ensuite déterminés en prenant le premier et dernier point de valeur 0
 
 Finalement un dernier échantillonnage suivi d'une binarisation sur le même seuil permet de trouver la liste binaire à analyser. Cette liste devant être compatible avec les hypotheses de données auxquelles nous allons le comparer, la binarisation ce fera dans le sens contraire de la première.
 C'est à dire que les points de valeurs inférieures au seuil vont valoir 0 tandis que les autres vont valoir 0.
@@ -122,7 +123,11 @@ Le nombre de point échantillonnés est calculé en prenant $N=u*95$ avec u le p
 \subsubsection{Analyse du code barre binaire}
 La prochaine étape consiste à séparer les différents blocs contenu dans la liste binaire obtenu précédemment en ne gardant que ceux représentant des nombres
 Pour décoder chaque blocs, ils font être comparé avec des données de décodage en adaptant celle-ci à la taille du bloc 
-Le choix se fera en prenant la plus petit norme entre le bloc et les données comparés.
+Le choix se fera en prenant la plus petit norme de la différence entre le bloc et les données comparés.
+
+Le résultat de cette analyse se traduit par une liste de 12 chiffres et d'une liste de 6 lettres (A ou B)
+permettant de déterminer le premier chiffre du code-barres
+
 \subsubsection*{Détermination du dernier chiffre du code barre}
 
 À partir des six premières valeurs obtenues, nous pouvons déterminer le premier chiffre. 
@@ -143,8 +148,6 @@ Il suffit ainsi de lire le tableau de correspondance suivant :
     \caption{Tableau des familles d’appartenance de la première séquence}
     \label{tab:sequence}
 \end{table}
-
-\subsubsection*{Analyse du code barre binaire}
 
 \subsubsection*{Vérification de la clef de contrôle}
 
