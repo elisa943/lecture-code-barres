@@ -13,11 +13,11 @@ from Blob import Blob
 from time import time
 from Blob import Blob
 from math import floor, sqrt
+import os
+from common import bornage 
 start_time = time()
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Fonctions préliminaires ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-def bornage2(h,w,ray):
-    # unused for now
-    return np.array(bornage(h,w,ray[0]),bornage(h,w,ray[1]))
+
 
 def bornage(h, w, p): # à voir si une accélération est possible
     if p[0] < 0:
@@ -49,10 +49,10 @@ def G_y_prime(sigma):  # derive d'une gaussienne
 
 def D(X, Y, Z): return np.sqrt((X-Y)**2+4*Z**2)/(X+Y)
 
-def barcode_detection(img_code_barre,sigma_g,sigma_t,seuil,sigma_bruit=2,affichage=False):
+def barcode_detection(img,sigma_g,sigma_t,seuil,sigma_bruit=2,affichage=False):
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Préparation de l'image ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # %%
-    img_code_barre = plt.imread('img/code_barre_prof.jpg')
+    img_code_barre = plt.imread(img)
     # ~~~~~~~~~~~~~~~~~~~~ transformation de rgb en ycrcb  ~~~~~~~~~~~~~~~~~~~
     img_code_barre_YCbCr = color.rgb2ycbcr(img_code_barre)
     Y_code_barre = img_code_barre_YCbCr[:, :, 0]
@@ -99,9 +99,16 @@ def barcode_detection(img_code_barre,sigma_g,sigma_t,seuil,sigma_bruit=2,afficha
     Blobs=[Blob(pixels=x.coords) for x in blobs]
     axis=[b.calc_axis() for b in Blobs]
     #============================================================================================================
-    plt.figure(0)
+    plt.figure()
     plt.subplot(1, 2, 1)
     plt.imshow(img_code_barre)
+    for blob in Blobs:
+        assert(blob.axis!=None)
+        a,b=blob.axis
+        p=blob.barycentre
+        plt.plot(p[1],p[0],"or",markersize=2.5)
+        plt.plot(a[0],a[1],"+b",markersize=5)
+        plt.plot(b[0],b[1],"+b",markersize=5)
     plt.title("img origine")
     plt.subplot(1, 2, 2)
     plt.imshow(D_labeled, cmap=cm.BrBG_r)
@@ -115,7 +122,7 @@ def barcode_detection(img_code_barre,sigma_g,sigma_t,seuil,sigma_bruit=2,afficha
     plt.title("img labelisee")
     plt.colorbar()
     # aff=[b.__repr__() for b in Blobs]
-    # plt.show()
+    plt.show()
     if affichage:
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Affichage ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -162,22 +169,22 @@ def barcode_detection(img_code_barre,sigma_g,sigma_t,seuil,sigma_bruit=2,afficha
         plt.imshow(D_seuil, cmap='gray')
         plt.title("D seuil")
 
-        plt.figure(6)
-        plt.subplot(1, 2, 1)
-        plt.imshow(img_code_barre)
-        plt.title("img origine")
-        plt.subplot(1, 2, 2)
-        plt.imshow(D_labeled, cmap=cm.BrBG_r)
-        for blob in Blobs:
-            assert(blob.axis!=None)
-            a,b=blob.axis
-            p=blob.barycentre
-            plt.plot(p[1],p[0],"or",markersize=2.5)
-            plt.plot(a[0],a[1],"+b",markersize=5)
-            plt.plot(b[0],b[1],"+b",markersize=5)
-        plt.title("img labelisee")
+        # plt.figure(6)
+        # plt.subplot(1, 2, 1)
+        # plt.imshow(img_code_barre)
+        # plt.title("img origine")
+        # plt.subplot(1, 2, 2)
+        # plt.imshow(D_labeled, cmap=cm.BrBG_r)
+        # for blob in Blobs:
+        #     assert(blob.axis!=None)
+        #     a,b=blob.axis
+        #     p=blob.barycentre
+        #     plt.plot(p[1],p[0],"or",markersize=2.5)
+        #     plt.plot(a[0],a[1],"+b",markersize=5)
+        #     plt.plot(b[0],b[1],"+b",markersize=5)
+        # plt.title("img labelisee")
 
-        aff=[b.__repr__() for b in Blobs]
+        # aff=[b.__repr__() for b in Blobs]
         
         plt.show()
 
@@ -185,19 +192,28 @@ def barcode_detection(img_code_barre,sigma_g,sigma_t,seuil,sigma_bruit=2,afficha
     return Blobs
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ TEST DE L'EXTRACTION ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # %%
-img_code_barre="img/code_barre_prof.jpg"
-# Pour le bruit, à regler à la main
-sigma_bruit =1
+img="img/barcode0.jpg"
+# Pour le bruit, à regler à la main (2 c pas mal)
+sigma_bruit = 2
 
 # Pour le gradient, relativement faible pour trouver les vecteurs de transition correspondant aux barres
-sigma_g =1
+sigma_g = 2 
 
 # Pour le tenseur, relativement élevé pour trouer des clusters de vecteurs gradient
-sigma_t = 15
+sigma_t = 50
 
 seuil = 0.7 
+print(os.listdir("img"))
+# u=barcode_detection("img/code_barre_prof.jpg",1,15,0.7,2,affichage=False)
+u=barcode_detection("img/barcode0.jpg",2,70,0.7,2)
+for blob in u:
+    print(blob.barycentre)
+    print(blob.axis)
+    o=blob.axis
+    # blob.__repr__()
+    
+# u=barcode_detection("img/b1.jpg",2,50,0.7,2,affichage=False)
 
-u=barcode_detection(img_code_barre,sigma_g,sigma_t,seuil,sigma_bruit=2,affichage=False)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Fonctions tracé de rayons ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # %%
