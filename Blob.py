@@ -48,7 +48,10 @@ class Blob:
         if self.axis==None:
             p1 = floor(self.barycentre[1]+self.valeurs_propres[0]/2*self.vecteurs_propres[0][0]), floor(self.barycentre[0]+self.valeurs_propres[0]/2*self.vecteurs_propres[0][1])
             p2 = floor(self.barycentre[1]-self.valeurs_propres[0]/2*self.vecteurs_propres[0][0]), floor(self.barycentre[0]-self.valeurs_propres[0]/2*self.vecteurs_propres[0][1])
+            
             self.axis=[p1,p2]
+        
+        
         return self.axis
         
         
@@ -70,13 +73,13 @@ class Blob:
         c,d=p2[1]-min(self.X)+floor(w/4),p2[0]-min(self.Y)+floor(h/4)
         a,b=bornage(h,w,[a,b])
         c,d=bornage(h,w,[c,d])
-        print((a,b))
-        print((c,d))
+        # print((a,b))
+        # print((c,d))
         # print((c,d))
         I[b,a]=5
         I[d,c]=5
         # barycentre
-        I[floor(w/2),floor(h/2)]=3
+        I[floor(w/2),floor(h/2)]=5
         plt.imshow(I,cmap=cm.hot)
         plt.colorbar()
         return str("Plot du Blob")
