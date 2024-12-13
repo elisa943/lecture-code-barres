@@ -178,6 +178,7 @@ unités est égal au complément à 10 du $13^{eme}$ chiffre du code.
 \section{Implémentation}
 
 \subsection{Phase 1 : Détection du code barre}
+
 \subsection{Phase 2 : Lecture du code barre}
 
 \section{Résultats}
@@ -213,14 +214,8 @@ Grâce à ce seuil, nous obtenons ainsi l'image seuillée :
 \end{figure}
 
 \subsubsection*{Détermination des limites du code-barres}
-\subsubsection*{Détermination du dernier chiffre du code barre}
 \subsubsection*{Analyse du code barre binaire}
-\subsubsection*{Vérification de la clef de contrôle}
-Nous obtenons finalement pour cette image le code \textbf{4902030187590}, ce qui correspond bien au code barre présent sur l'image.
-De manière générale, il faut tout de même vérifier la validité du code barre. Pour cela, nous suivons l'algorithme de vérification de code barre grâce à la clé de contrôle.
-
-En l'occurrence, le complément à 10 du dernier chiffre du code barre vaut 0, tandis que le chiffre des unités de la somme des chiffres de rang impair et trois fois la somme des chiffres de rang pair vaut 0. 
-Le code barre est donc valide.
+\subsubsection*{Détermination du dernier chiffre du code barre}
 
 % Afficher l'image avec les deux points reçu en argument
 \begin{figure}[H] % Ajouter les deux points reçu en argument 
@@ -244,6 +239,14 @@ Le code barre est donc valide.
 	\caption{Détection du noir et blanc}
 	\label{fig:detection}
 \end{figure}
+
+\subsubsection*{Vérification de la clef de contrôle}
+Nous obtenons alors pour cette image le code \textbf{4902030187590}, ce qui correspond bien au code barre présent sur l'image.
+De manière générale, il faut tout de même vérifier la validité du code barre. Pour cela, nous suivons l'algorithme de vérification de code barre grâce à la clé de contrôle.
+
+En l'occurrence, le complément à 10 du dernier chiffre du code barre vaut 0, tandis que le chiffre des unités de la somme des chiffres de rang impair et trois fois la somme des chiffres de rang pair vaut 0. 
+Le code barre est donc valide.
+
 
 \section{Bilan de l'organisation}
 
