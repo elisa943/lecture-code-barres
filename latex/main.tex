@@ -18,6 +18,7 @@
 \usepackage{multicol} % Pour les colonnes
 \usepackage{listings}
 \usepackage{courier}
+\usepackage{subcaption}
 
 \definecolor{backcolour}{RGB}{47,47,47}
 \definecolor{violet}{RGB}{200,20,200}
@@ -99,8 +100,9 @@ Nous supposons recevoir en paramètres deux couples de points représentants un 
 \subsection{Détermination des limites du code-barres}
 
 Le rayon initial traverse potentiellement des zones inutiles de l'image. Il est donc essentiel de réduire ce segment pour que ses extrémités coïncident avec les bords du code-barres (les premières barres noires détectées).  
-Cette étape est réalisée en échantillonnant l’image le long du segment défini, puis en appliquant un seuil de binarisation. Ce seuil est calculé grâce à l’algorithme d’Otsu.  
+Cette première étape est réalisée en échantillonnant l’image le long du segment défini, puis en appliquant un seuil de binarisation. Ce seuil est calculé grâce à l’algorithme d’Otsu.  
 
+\subsection{Seuillage de l'image avec Otsu}
 
 \subsection{Binarisation de l'image}
 
@@ -110,10 +112,19 @@ Prenons l'image suivante :
 	\centering
 	\includegraphics[width=0.5\textwidth]{images/barcode0.jpg}
 	\caption{Image du code barre}
-	\label{fig:barcode}
+\end{figure}
+
+% Afficher l'image avec les deux points reçu en argument
+\begin{figure}[H] % Ajouter les deux points reçu en argument 
+	\centering
+	\includegraphics[width=0.5\textwidth]{images/code_barre_couple_vert.png}
+	\caption{Segment défini par le deux points en arguments}
 \end{figure}
 
 La première étape de cette phase est de réduire ce rayon, de sorte que les deux nouveaux points correspondent à la première barre noire du code barre.
+Pour cela, nous devons tout d'abord opérer un seuillage de l'image.
+
+Pour cela, nous échantillonnons le segment vert (cf. Figure). 
 
 \begin{figure}[H] 
 	\centering
@@ -121,7 +132,6 @@ La première étape de cette phase est de réduire ce rayon, de sorte que les de
 	\caption{Image du code barre}
 	\label{fig:histo}
 \end{figure}
-
 
 \begin{figure}[H] 
 	\centering
