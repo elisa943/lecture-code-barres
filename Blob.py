@@ -5,14 +5,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from math import floor, sqrt
-from common import bornage,bornage2
-
+from common import *
 
 class Blob:
     def __init__(self, pixels=None,imsize=None, X=None,Y=None, barycentre=None, valeurs_propres=None, vecteurs_propres=None,area=None,axis=None):
         # Arguments indispensables
         self.pixels = pixels 
-        self.imsize=imsize
+        self.imsize=imsize # (h,w)
         # Calculés ultérieurement
         self.X = X
         self.Y = Y 
@@ -48,15 +47,39 @@ class Blob:
         
     def calc_axis(self):
         self.calc_all()
-        if self.axis==None:
+        if self.axis.any()==None:
             p1 = floor(self.barycentre[1]+self.valeurs_propres[0]/2*self.vecteurs_propres[0][0]), floor(self.barycentre[0]+self.valeurs_propres[0]/2*self.vecteurs_propres[0][1])
             p2 = floor(self.barycentre[1]-self.valeurs_propres[0]/2*self.vecteurs_propres[0][0]), floor(self.barycentre[0]-self.valeurs_propres[0]/2*self.vecteurs_propres[0][1])
             self.axis=[p1,p2]
         return self.axis
+    
+    def calc_axis_ray(self,len_adjust=1):
+        # len adjust: facteur d'ajustement pour la longueur finale de l'axe. initialement à 1.
+        self.calc_all()
+        if self.valeurs_propres[0]>self.valeurs_propres[1]: #on détecte la valeur propre la plus grande
+            imax=0 
+        else:
+            imax=1
+        axe=np.abs(self.vecteurs_propres[:,(imax+1)%2]) #on extrait le vecteur propre correspondant à la valeur minimale
+        # abs pour etre sur d'extraire le bon angle
+        axe_norm=axe/np.linalg.norm(axe,2) 
+        alpha=np.arccos(axe_norm[0]) # on extrait l'angle avec l'horizontale
+        r=len_adjust*np.sqrt(self.valeurs_propres[imax])
+        # vérifier l'ordre de X et Y, peut-être inversés
+        self.axis = ray_center(self.barycentre[::-1],r , alpha) 
+        # debug
+        # print(np.linalg.norm(axe,2))
+        # print(axe_norm)
+        # print(alpha)
+        # print(r)
+        return self.axis
         
-    def draw_random_rays(self):
-        
-        return
+    # def draw_random_rays(self):
+    #     num_angles=6
+    #     num_longueurs=6
+    #     langle=[i*np.pi/num_angles for i in range(num_angles)]
+    #     llens=[]
+    #     return
     # @property
     def __repr__(self):
         plt.figure()

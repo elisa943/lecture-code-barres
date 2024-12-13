@@ -5,6 +5,7 @@ Created on Thu Dec 12 18:58:05 2024
 @author: Admin
 """
 import numpy as np
+import matplotlib.pyplot as plt
 
 def bornage(h, w, p): # à voir si une accélération est possible
     if p[0] < 0:
@@ -60,3 +61,12 @@ def random_ray(h, w, length):
     x2 = x1+offset
 
     return np.int32([bornage(h, w, x1), bornage(h, w, x2)])
+
+
+def plot_ray(ray):
+    plt.figure()
+    plt.plot(ray[:,0],ray[:,1])
+    k=5
+    plt.plot(k * np.array([1, 1, -1, -1, 1]), k * np.array([1, -1, -1, 1, 1]))
+    plt.grid()
+    return

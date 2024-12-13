@@ -14,7 +14,7 @@ from time import time
 from Blob import Blob
 from math import floor, sqrt
 import os
-from common import bornage 
+from common import * 
 start_time = time()
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Fonctions préliminaires ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -85,28 +85,28 @@ def barcode_detection(img,sigma_g,sigma_t,seuil,sigma_bruit=2,affichage=False):
     coords=[x.coords for x in blobs]
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Extraction de l'axe ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Blobs=[Blob(pixels=x.coords) for x in blobs]
-    axis=[b.calc_axis() for b in Blobs]
+    axis=[b.calc_axis_ray(6) for b in Blobs]
     #============================================================================================================
     plt.figure()
     plt.subplot(1, 2, 1)
     plt.imshow(img_code_barre)
     for blob in Blobs:
-        assert(blob.axis!=None)
-        a,b=blob.axis
+        # assert(blob.axis!=None)
+        x=[u[0] for u in blob.axis]
+        y=[u[1] for u in blob.axis]
         p=blob.barycentre
         plt.plot(p[1],p[0],"or",markersize=2.5)
-        plt.plot(a[0],a[1],"+b",markersize=5)
-        plt.plot(b[0],b[1],"+b",markersize=5)
+        plt.plot(x,y,"+b",markersize=5)
     plt.title("img origine")
     plt.subplot(1, 2, 2)
     plt.imshow(D_labeled, cmap=cm.BrBG_r)
     for blob in Blobs:
-        assert(blob.axis!=None)
-        a,b=blob.axis
+        # assert(blob.axis!=None)
+        x=[u[0] for u in blob.axis]
+        y=[u[1] for u in blob.axis]
         p=blob.barycentre
         plt.plot(p[1],p[0],"or",markersize=2.5)
-        plt.plot(a[0],a[1],"+b",markersize=5)
-        plt.plot(b[0],b[1],"+b",markersize=5)
+        plt.plot(x,y,"+b",markersize=5)
     plt.title("img labelisee")
     plt.colorbar()
     # aff=[b.__repr__() for b in Blobs]
@@ -191,14 +191,14 @@ sigma_g = 2
 sigma_t = 50
 
 seuil = 0.7 
-print(os.listdir("img"))
+# print(os.listdir("img"))
 # u=barcode_detection("img/code_barre_prof.jpg",1,15,0.7,2,affichage=False)
-u=barcode_detection("img/barcode0.jpg",sigma_g=2,sigma_t=10,seuil=0.7,sigma_bruit=2)
+u=barcode_detection("img/barcode0.jpg",sigma_g=2,sigma_t=50,seuil=0.7,sigma_bruit=2)
 for blob in u:
     print(blob.barycentre)
     print(blob.axis)
     o=blob.axis
-    blob.__repr__()
+    # blob.__repr__()
     
 # u=barcode_detection("img/b1.jpg",2,50,0.7,2,affichage=False)
 
