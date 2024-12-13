@@ -93,33 +93,52 @@
 
 \section{Algorithmes}
 
-\subsection{Phase 1}
-\subsection{Phase 2}
+\subsection{Phase 1 : Détection du code barre}
+\subsection{Phase 2 : Lecture du code barre}
+
+La phase précédente a permis de récupérer un ensemble de couple de points représentant des rayons. 
+Pour chaque couple de points, nous déterminons d'une part les 13 valeurs du code barre, et d'autre part, s'il est valide ou non.
 
 \subsubsection*{Seuillage à l'aide d'Otsu}
+La méthode d'Otsu est une technique de seuillage utilisée en traitement d'images pour la segmentation binaire. 
+Elle vise à séparer les pixels d'une image en deux classes distinctes : l'avant-plan et l'arrière-plan. 
+L'algorithme d'Otsu fonctionne en cherchant le seuil de gris qui minimise la variance intra-classe, c'est-à-dire la somme des variances des deux classes. 
+Pour ce faire, il calcule l'histogramme des niveaux de gris de l'image et évalue la dispersion des pixels pour chaque seuil possible. 
+Le seuil optimal est celui qui maximise la variance inter-classe, assurant ainsi une séparation claire entre les deux classes. 
+En pratique, le seuil calculé devrait se situer entre les deux pics de l'histogramme.
 
 \subsubsection*{Détermination des limites du code-barres}
-
 \subsubsection*{Détermination du dernier chiffre du code barre}
+
+À partir des six premières valeurs obtenues, nous pouvons déterminer le premier chiffre. 
+Il suffit ainsi de lire le tableau de correspondance suivant :
+
+\begin{table}[h!]
+    \centering
+    \renewcommand{\arraystretch}{1.5} % Ajuste l'espacement vertical
+    \begin{tabular}{|c|c|c|c|}
+        \hline
+        \textbf{Séquence} & \textbf{1\textsuperscript{er} Chiffre} & \textbf{Séquence} & \textbf{1\textsuperscript{er} Chiffre} \\ \hline
+        AAAAAA & 0 & ABBAAB & 5 \\ \hline
+        AABABB & 1 & ABBBAA & 6 \\ \hline
+        AABBAB & 2 & ABABAB & 7 \\ \hline
+        AABBBA & 3 & ABABBA & 8 \\ \hline
+        ABAABB & 4 & ABBABA & 9 \\ \hline
+    \end{tabular}
+    \caption{Tableau des familles d’appartenance de la première séquence}
+    \label{tab:sequence}
+\end{table}
 
 \subsubsection*{Analyse du code barre binaire}
 
 \section{Vérification de la clef de contrôle}
 
-\subsection{Phase 1}
-\subsection{Phase 2}
+\subsection{Phase 1 : Détection du code barre}
+\subsection{Phase 2 : Lecture du code barre}
 
 \section{Résultats}
 
-\section {Phase 1 : Détection du code barre}
-
-\section{Phase 2 : Lecture du code barre}
-
-La phase précédente a permis de récupérer un ensemble de couple de points représentant des rayons. 
-Pour chaque couple de points, nous déterminons d'une part les 13 valeurs du code barre, et d'autre part, s'il est valide ou non.
-
-\subsection{Seuillage de l'image avec Otsu}
-
+\subsubsection*{Seuillage à l'aide d'Otsu}
 Prenons l'image suivante :
 \begin{figure}[H] % Ajouter les deux points reçu en argument 
 	\centering
@@ -131,7 +150,6 @@ Prenons l'image suivante :
 Avant cela de pouvoir lire un code barre, nous devons opérer un seuillage de l'image. Pour cela, nous utilisons la méthode d'Otsu.
 Cette méthode repose sur le calcul d'un seuil optimal pour binariser une image en niveaux de gris.
 Ce seuil est déterminé grâce à l'histogramme de l'image et est censé séparer les pixels en deux classes distinctes : les pixels noirs et les pixels blancs.
-En pratique, le seuil calculé devrait se situer entre les deux pics de l'histogramme.
 
 Pour la figure \ref{code_barre}, nous obtenons l'histogramme suivant :
 
@@ -144,6 +162,27 @@ Pour la figure \ref{code_barre}, nous obtenons l'histogramme suivant :
 
 Grâce à ce seuil, nous obtenons ainsi l'image seuillée : 
 % Ajouter image seuillée avec Otsu
+
+\subsubsection*{Détermination des limites du code-barres}
+\subsubsection*{Détermination du dernier chiffre du code barre}
+\subsubsection*{Analyse du code barre binaire}
+
+
+
+
+
+
+\subsubsection*{Détermination des limites du code-barres}
+
+\subsubsection*{Détermination du dernier chiffre du code barre}
+
+\subsubsection*{Analyse du code barre binaire}
+
+\section{A ENLEVER : Phase 2 : Lecture du code barre}
+
+\subsection{Seuillage de l'image avec Otsu}
+
+
 
 \subsection{Détermination des limites du code-barres}
 
@@ -171,7 +210,6 @@ Cet ensemble de points va alors être binarisé grâce au seuil.
 
 Les points déterminant le début et la fin du code-barres sont ensuite déterminés en prenant le premier et dernier point de valeur 0
 
-
 \begin{figure}[H] 
 	\centering
 	\includegraphics[width=0.5\textwidth]{images/detection.png}
@@ -188,24 +226,6 @@ Pour décoder chaque blocs, ils font être comparé avec des données de décoda
 Le choix se fera en prenant la plus petit norme entre le bloc et les données comparés. 
 
 \subsection{Détermination du dernier chiffre du code barre}
-À partir des six premières valeurs obtenues, nous pouvons déterminer le premier chiffre. 
-Il suffit ainsi de lire le tableau de correspondance suivant :
-
-\begin{table}[h!]
-    \centering
-    \renewcommand{\arraystretch}{1.5} % Ajuste l'espacement vertical
-    \begin{tabular}{|c|c|c|c|}
-        \hline
-        \textbf{Séquence} & \textbf{1\textsuperscript{er} Chiffre} & \textbf{Séquence} & \textbf{1\textsuperscript{er} Chiffre} \\ \hline
-        AAAAAA & 0 & ABBAAB & 5 \\ \hline
-        AABABB & 1 & ABBBAA & 6 \\ \hline
-        AABBAB & 2 & ABABAB & 7 \\ \hline
-        AABBBA & 3 & ABABBA & 8 \\ \hline
-        ABAABB & 4 & ABBABA & 9 \\ \hline
-    \end{tabular}
-    \caption{Tableau des familles d’appartenance de la première séquence}
-    \label{tab:sequence}
-\end{table}
 
 \subsection{Vérification de la clef de contrôle}
 Nous obtenons finalement pour cette image le code \textbf{4902030187590}, ce qui correspond bien au code barre présent sur l'image.
