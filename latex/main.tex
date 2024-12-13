@@ -123,6 +123,28 @@ Le nombre de point échantillonnés est calculé en prenant $N=u*95$ avec u le p
 La prochaine étape consiste à séparer les différents blocs contenu dans la liste binaire obtenu précédemment en ne gardant que ceux représentant des nombres
 Pour décoder chaque blocs, ils font être comparé avec des données de décodage en adaptant celle-ci à la taille du bloc 
 Le choix se fera en prenant la plus petit norme entre le bloc et les données comparés.
+
+\begin{table}[h!]
+    \centering
+    \renewcommand{\arraystretch}{1.5} % Ajuste l'espacement vertical
+    \begin{tabular}{|c|c|c|c|}
+        \hline
+        & \textbf{Élément A} & \textbf{Élément B} & \textbf{Élément C} \\ \hline
+        0 & BBBNBNN & BNBBNNN & NNNBBNB \\ \hline
+        1 & BBNNBBN & BNNBBNN & NNBBNNB \\ \hline
+        2 & BBNBBNN & BBNNBNN & NNBNNBB \\ \hline
+        3 & BNNNNBN & BNBBBNN & NBBBNNB \\ \hline
+        4 & BNBBBNN & BBNNNBN & NBNNBB \\ \hline
+        5 & BNNBBBN & BNNNBBN & NBBNNNB \\ \hline
+        6 & BBNBNNN & BBBNBNN & NBNBBNB \\ \hline
+        7 & BNNNBNN & BBNBBBN & NBBBNNB \\ \hline
+        8 & BNNBNNN & BBBBBNN & NBBNBBB \\ \hline
+        9 & BBBNBNN & BBNBNNN & NNNBNBB \\ \hline
+    \end{tabular}
+    \caption{Tableau des éléments et des séquences associées}
+    \label{tab:elements}
+\end{table}
+
 \subsubsection*{Détermination du dernier chiffre du code barre}
 
 À partir des six premières valeurs obtenues, nous pouvons déterminer le premier chiffre. 
@@ -217,11 +239,6 @@ Le code barre est donc valide.
 	\caption{Détection du noir et blanc}
 	\label{fig:detection}
 \end{figure}
-
-
-\subsection{Détermination du dernier chiffre du code barre}
-
-\subsection{Vérification de la clef de contrôle}
 
 \section{Bilan de l'organisation}
 
