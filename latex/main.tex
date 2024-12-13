@@ -91,15 +91,20 @@
 
 \section{Introduction}
 
-\subsection{Phase 1}
-\subsection{Phase 2}
-
 \section{Algorithmes}
 
 \subsection{Phase 1}
 \subsection{Phase 2}
 
-\section{Implémentation}
+\subsubsection*{Seuillage à l'aide d'Otsu}
+
+\subsubsection*{Détermination des limites du code-barres}
+
+\subsubsection*{Détermination du dernier chiffre du code barre}
+
+\subsubsection*{Analyse du code barre binaire}
+
+\section{Vérification de la clef de contrôle}
 
 \subsection{Phase 1}
 \subsection{Phase 2}
@@ -115,7 +120,15 @@ Pour chaque couple de points, nous déterminons d'une part les 13 valeurs du cod
 
 \subsection{Seuillage de l'image avec Otsu}
 
-Avant cela, nous devons opérer un seuillage de l'image. Pour cela, nous utilisons la méthode d'Otsu.
+Prenons l'image suivante :
+\begin{figure}[H] % Ajouter les deux points reçu en argument 
+	\centering
+	\includegraphics[width=0.5\textwidth]{images/barcode0.jpg}
+	\caption{Image d'un code barre}
+	\label{code_barre}
+\end{figure}
+
+Avant cela de pouvoir lire un code barre, nous devons opérer un seuillage de l'image. Pour cela, nous utilisons la méthode d'Otsu.
 Cette méthode repose sur le calcul d'un seuil optimal pour binariser une image en niveaux de gris.
 Ce seuil est déterminé grâce à l'histogramme de l'image et est censé séparer les pixels en deux classes distinctes : les pixels noirs et les pixels blancs.
 En pratique, le seuil calculé devrait se situer entre les deux pics de l'histogramme.
@@ -136,17 +149,6 @@ Grâce à ce seuil, nous obtenons ainsi l'image seuillée :
 
 Le rayon initial traverse potentiellement des zones inutiles de l'image. Il est donc essentiel de réduire ce segment pour que ses extrémités coïncident avec les bords du code-barres (les premières barres noires détectées).  
 Cette première étape est réalisée en échantillonnant l’image le long du segment défini, puis en appliquant un seuil de binarisation. Ce seuil est calculé grâce à l’algorithme d’Otsu.  
-
-\subsection{Binarisation de l'image}
-
-Prenons l'image suivante :
-
-\begin{figure}[H] % Ajouter les deux points reçu en argument 
-	\centering
-	\includegraphics[width=0.5\textwidth]{images/barcode0.jpg}
-	\caption{Image du code barre}
-	\label{code_barre}
-\end{figure}
 
 % Afficher l'image avec les deux points reçu en argument
 \begin{figure}[H] % Ajouter les deux points reçu en argument 
@@ -180,7 +182,7 @@ Les points déterminant le début et la fin du code-barres sont ensuite détermi
 Finalement un dernier échantillonnage suivi d'une binarisation sur le même seuil permet de trouver la liste binaire à analyser
 Le nombre de point échantillonnés est calculé en prenant $N=u*95$ avec u le plus petit multiple de 95 tel que u*95>L la longueur du segment du code barre
 
-\subsubsection{Analyser du code barre binaire}
+\subsection{Analyse du code barre binaire}
 La prochaine étape consiste à séparer les différents blocs contenu dans la liste binaire obtenu précédemment en ne gardant que ceux représentant des nombres
 Pour décoder chaque blocs, ils font être comparé avec des données de décodage en adaptant celle-ci à la taille du bloc 
 Le choix se fera en prenant la plus petit norme entre le bloc et les données comparés. 
@@ -201,7 +203,7 @@ Il suffit ainsi de lire le tableau de correspondance suivant :
         AABBBA & 3 & ABABBA & 8 \\ \hline
         ABAABB & 4 & ABBABA & 9 \\ \hline
     \end{tabular}
-    \caption{Tableau des familles d’appartenance de la séquence}
+    \caption{Tableau des familles d’appartenance de la première séquence}
     \label{tab:sequence}
 \end{table}
 
