@@ -5,6 +5,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from math import floor, sqrt
+from common import bornage,bornage2
+
+
 class Blob:
     def __init__(self, pixels=None,X=None,Y=None, barycentre=None, valeurs_propres=None, vecteurs_propres=None,area=None,axis=None):
         self.pixels = pixels 
@@ -22,7 +25,9 @@ class Blob:
         self.barycentre=np.mean(self.pixels,axis=0)
         return self.barycentre
     def calc_vpropres(self):
-        # self.calc_XY() if (None in [self.X,self.Y]) else print("X,Y déjà définis")
+        
+        # if None in [self.X,self.Y]:
+        #     self.calc_XY() 
         self.valeurs_propres,self.vecteurs_propres=np.linalg.eig(np.cov(self.X,self.Y))
         return self.valeurs_propres,self.vecteurs_propres
     def calc_area(self): # pour éventuellement appliquer un critère de sélaction surla taille du bousin
@@ -55,17 +60,21 @@ class Blob:
         k=2
         h=floor((max(self.Y)+1-min(self.Y))*k)
         w=floor((max(self.X)+1-min(self.X))*k)
+        print((h,w))
         I=np.zeros((w,h))
         # I[self.barycentre[0]-min(self.X)+floor(w/4),self.barycentre[1]-min(self.Y)+floor(h/4)]=3
         # affichage du Blob
         I[self.X-min(self.X)+floor(w/4),self.Y-min(self.Y)+floor(h/4)]=1
-        
         # Affichage des points de l'axe
         a,b=p1[1]-min(self.X)+floor(w/4),p1[0]-min(self.Y)+floor(h/4)
         c,d=p2[1]-min(self.X)+floor(w/4),p2[0]-min(self.Y)+floor(h/4)
-        
-        I[p1[1]-min(self.X)+floor(w/4),p1[0]-min(self.Y)+floor(h/4)]=5
-        I[p2[1]-min(self.X)+floor(w/4),p2[0]-min(self.Y)+floor(h/4)]=5
+        a,b=bornage(h,w,[a,b])
+        c,d=bornage(h,w,[c,d])
+        print((a,b))
+        print((c,d))
+        # print((c,d))
+        I[b,a]=5
+        I[d,c]=5
         # barycentre
         I[floor(w/2),floor(h/2)]=3
         plt.imshow(I,cmap=cm.hot)
