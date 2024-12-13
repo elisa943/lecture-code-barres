@@ -122,9 +122,12 @@ Prenons l'image suivante :
 \end{figure}
 
 La première étape de cette phase est de réduire ce rayon, de sorte que les deux nouveaux points correspondent à la première barre noire du code barre.
-Pour cela, nous devons tout d'abord opérer un seuillage de l'image.
+Pour cela, nous devons tout d'abord opérer un seuillage de l'image grâce au seuil donné par l'algorithme d'otsu.
+Le segment est alors échantilloné en prenant le plus proches voisins. 
+Cet ensemble de points va alors être binarisé grâce au seuil.
 
-Pour cela, nous échantillonnons le segment vert (cf. Figure). 
+
+
 
 \begin{figure}[H] 
 	\centering
@@ -140,6 +143,9 @@ Pour cela, nous échantillonnons le segment vert (cf. Figure).
 	\label{fig:binarisation}
 \end{figure}
 
+Les points déterminant le début et la fin du code-barres sont ensuite déterminés en prenant le premier et dernier point de valeur 0
+
+
 \begin{figure}[H] 
 	\centering
 	\includegraphics[width=0.5\textwidth]{images/detection.png}
@@ -147,8 +153,14 @@ Pour cela, nous échantillonnons le segment vert (cf. Figure).
 	\label{fig:detection}
 \end{figure}
 
+Finalement un dernier échantillonnage suivi d'une binarisation sur le même seuil permet de trouver la liste binaire à analyser
+Le nombre de point échantillonés est calculé en prenant $N=u*95$ avec u le plus petit multiple de 95 tel que u*95>L la longueur du segment du code barre
 
+\subsubsection{Analyser du code barre binaire}
 
+La prochaine étape consiste à séparer les différents blocs contenu dans la liste binaire obtenu précédemment en ne gardant que ceux représentant des nombres
+Pour décoder chaque blocs, ils font être comparé avec des données de décodage en adaptant celle_ci à la taille du bloc 
+Le choix se fera en prenant la plus petit norme entre le bloc et les données comparés. 
 
 \section{Mise en commun des deux phases}
 
@@ -161,7 +173,7 @@ Pour cela, nous échantillonnons le segment vert (cf. Figure).
 	\begin{tabular}{c|c|c}
 		& Tâches entreprises& Temps passé\\ \hline
 		Elisa& Prise de connaissance du sujet et commencement de la méthode d'Otsu& 2h\\ \hline
-		Alban& & \\ \hline
+		Alban& Lecture et analyse du sujet et début de l'implémentation d'algorithme d'échantillonnage et de binarisation& 2h\\ \hline
 		Tierno& & \\ \hline
 		David& & 
 	\end{tabular}
