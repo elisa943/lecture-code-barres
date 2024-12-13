@@ -187,13 +187,13 @@ def phase1(x, y, img, seuil):
     # Binarisation
     xd,yd,xa,ya = find_lim(x1,y1,x2,y2,img,seuil)
 
-    """
+    
     plt.figure()
     plt.imshow(img, cmap='gray')
-    plt.plot([xd, xa], [yd, ya], 'ro-')
+    #plt.plot([xd, xa], [yd, ya], 'ro-')
     plt.plot([x1, x2], [y1, y2], 'go-')
     plt.show()
-    """
+    
     
     # Echantillonage + Binarisation de l'image après seuillage 
     segment_seuillage, u = find_u(xd,yd,xa,ya,img,seuil)
