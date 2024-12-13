@@ -131,7 +131,9 @@ Il suffit ainsi de lire le tableau de correspondance suivant :
 
 \subsubsection*{Analyse du code barre binaire}
 
-\section{Vérification de la clef de contrôle}
+\subsubsection*{Vérification de la clef de contrôle}
+
+\section{Implémentation}
 
 \subsection{Phase 1 : Détection du code barre}
 \subsection{Phase 2 : Lecture du code barre}
@@ -161,29 +163,26 @@ Pour la figure \ref{code_barre}, nous obtenons l'histogramme suivant :
 \end{figure}
 
 Grâce à ce seuil, nous obtenons ainsi l'image seuillée : 
-% Ajouter image seuillée avec Otsu
+\begin{figure}[H] 
+	\centering
+	\includegraphics[width=0.5\textwidth]{images/barcode_seuillee.png}
+	\caption{Image seuillée}
+	\label{img_seuillee}
+\end{figure}
 
 \subsubsection*{Détermination des limites du code-barres}
 \subsubsection*{Détermination du dernier chiffre du code barre}
 \subsubsection*{Analyse du code barre binaire}
+\subsubsection*{Vérification de la clef de contrôle}
+Nous obtenons finalement pour cette image le code \textbf{4902030187590}, ce qui correspond bien au code barre présent sur l'image.
+De manière générale, il faut tout de même vérifier la validité du code barre. Pour cela, nous suivons l'algorithme de vérification de code barre grâce à la clé de contrôle.
 
-
-
-
-
-
-\subsubsection*{Détermination des limites du code-barres}
-
-\subsubsection*{Détermination du dernier chiffre du code barre}
-
-\subsubsection*{Analyse du code barre binaire}
+En l'occurrence, le complément à 10 du dernier chiffre du code barre vaut 0, tandis que le chiffre des unités de la somme des chiffres de rang impair et trois fois la somme des chiffres de rang pair vaut 0. 
+Le code barre est donc valide.
 
 \section{A ENLEVER : Phase 2 : Lecture du code barre}
 
 \subsection{Seuillage de l'image avec Otsu}
-
-
-
 \subsection{Détermination des limites du code-barres}
 
 Le rayon initial traverse potentiellement des zones inutiles de l'image. Il est donc essentiel de réduire ce segment pour que ses extrémités coïncident avec les bords du code-barres (les premières barres noires détectées).  
