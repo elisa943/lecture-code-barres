@@ -208,16 +208,7 @@ Grâce à ce seuil, nous obtenons ainsi l'image seuillée :
 \end{figure}
 
 \subsubsection*{Détermination des limites du code-barres}
-\subsubsection*{Détermination du dernier chiffre du code barre}
-\subsubsection*{Analyse du code barre binaire}
-\subsubsection*{Vérification de la clef de contrôle}
-Nous obtenons finalement pour cette image le code \textbf{4902030187590}, ce qui correspond bien au code barre présent sur l'image.
-De manière générale, il faut tout de même vérifier la validité du code barre. Pour cela, nous suivons l'algorithme de vérification de code barre grâce à la clé de contrôle.
 
-En l'occurrence, le complément à 10 du dernier chiffre du code barre vaut 0, tandis que le chiffre des unités de la somme des chiffres de rang impair et trois fois la somme des chiffres de rang pair vaut 0. 
-Le code barre est donc valide.
-
-% Afficher l'image avec les deux points reçu en argument
 \begin{figure}[H] % Ajouter les deux points reçu en argument 
 	\centering
 	\includegraphics[width=0.5\textwidth]{images/code_barre_couple_vert.png}
@@ -228,17 +219,48 @@ Le code barre est donc valide.
 \begin{figure}[H] 
 	\centering
 	\includegraphics[width=0.5\textwidth]{images/binarisation.png}
-	\caption{Délimitation}
+	\caption{Nouveau segment produit par l'échantillonnage et la binarisation}
 	\label{fig:binarisation}
 \end{figure}
 
+\subsubsection*{Analyse du code barre binaire}
+
+À partir du nouveau couple de points, on échantillonne une nouvelle fois le segment sur l'image seuillée. 
+On en déduit alors une liste de valeurs binaires. Ceci nous permet ainsi de détecter les zones noires et blanches du code-barres. 
+La figure \ref{fig:detection} illustre cette détection, où les zones noires sont représentées en rouge et les zones blanches en bleu.
 
 \begin{figure}[H] 
 	\centering
-	\includegraphics[width=0.5\textwidth]{images/detection.png}
+	\includegraphics[width=0.5\textwidth]{images/code_seuille_couleur.png}
 	\caption{Détection du noir et blanc}
 	\label{fig:detection}
 \end{figure}
+
+\begin{figure}[H] 
+	\centering
+	\includegraphics[width=0.5\textwidth]{images/zoom_code_seuille_couleur.png}
+	\caption{Zoom de la détection}
+	\label{fig:detection_zoom}
+\end{figure}
+
+On souhaite noter ici que le décalage apparent sur l'image n'est que le résultat du dé-zoom de l'image.
+À petite échelle, on voit clairement que les zones sont bien détectées. 
+
+\subsubsection*{Détermination du premier chiffre du code barre}
+À l'aide de la séquence AB obtenue, nous pouvons ainsi déterminer le premier chiffre du code barre en se référant au tableau \ref{tab:sequence}.
+En l'occurrence, nous obtenons le chiffre \textbf{4} comme premier chiffre. 
+
+\subsubsection*{Vérification de la clef de contrôle}
+Nous obtenons finalement pour cette image le code \textbf{4902030187590}, ce qui correspond bien au code barre présent sur l'image.
+De manière générale, il faut tout de même vérifier la validité du code barre. Pour cela, nous suivons l'algorithme de vérification de code barre grâce à la clé de contrôle.
+
+En l'occurrence, le complément à 10 du dernier chiffre du code barre vaut 0, tandis que le chiffre des unités de la somme des chiffres de rang impair et trois fois la somme des chiffres de rang pair vaut 0. 
+Le code barre est donc valide.
+
+
+\newpage 
+
+\section{Conclusion}
 
 \section{Bilan de l'organisation}
 
@@ -300,7 +322,7 @@ Le code barre est donc valide.
 
 \subsection{Séance 5} % 13 Décembre 
 
-\begin{table}[htbp]
+\begin{table}[H]
 	\centering 
 	\begin{tabular}{c|c|c}
 		& Tâches entreprises& Temps passé\\ \hline
