@@ -9,8 +9,11 @@ from common import bornage,bornage2
 
 
 class Blob:
-    def __init__(self, pixels=None,X=None,Y=None, barycentre=None, valeurs_propres=None, vecteurs_propres=None,area=None,axis=None):
+    def __init__(self, pixels=None,imsize=None, X=None,Y=None, barycentre=None, valeurs_propres=None, vecteurs_propres=None,area=None,axis=None):
+        # Arguments indispensables
         self.pixels = pixels 
+        self.imsize=imsize
+        # Calculés ultérieurement
         self.X = X
         self.Y = Y 
         self.barycentre = barycentre 
@@ -48,13 +51,12 @@ class Blob:
         if self.axis==None:
             p1 = floor(self.barycentre[1]+self.valeurs_propres[0]/2*self.vecteurs_propres[0][0]), floor(self.barycentre[0]+self.valeurs_propres[0]/2*self.vecteurs_propres[0][1])
             p2 = floor(self.barycentre[1]-self.valeurs_propres[0]/2*self.vecteurs_propres[0][0]), floor(self.barycentre[0]-self.valeurs_propres[0]/2*self.vecteurs_propres[0][1])
-            
             self.axis=[p1,p2]
-        
-        
         return self.axis
         
+    def draw_random_rays(self):
         
+        return
     # @property
     def __repr__(self):
         plt.figure()
