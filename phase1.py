@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import cv2
+from time import time 
 
 def otsu(img, bins=255, displayHisto=False):
     luminance = None
@@ -174,6 +175,8 @@ def clef_controle(decode):
     return clef == complement
 
 def phase1(x, y, img, seuil):
+    starttime = time()
+    
     x1 = x[0]
     y1 = y[0]
     x2 = x[1]
@@ -213,6 +216,8 @@ def phase1(x, y, img, seuil):
     # Vérification de la clé de contrôle
     if clef_controle(code_barre):
         print("Code barre valide : ", code_barre)
+        endtime = time() - starttime
+        print("Temps d'exécution : ", endtime)
         return code_barre
     else:
         print("Code barre invalide : ", code_barre)
