@@ -125,10 +125,31 @@ La prochaine étape consiste à séparer les différents blocs contenu dans la l
 Pour décoder chaque blocs, ils font être comparé avec des données de décodage en adaptant celle-ci à la taille du bloc 
 Le choix se fera en prenant la plus petit norme de la différence entre le bloc et les données comparés.
 
-Le résultat de cette analyse se traduit par une liste de 12 chiffres et d'une liste de 6 lettres (A ou B)
-permettant de déterminer le premier chiffre du code-barres
+\begin{table}[h!]
+    \centering
+    \renewcommand{\arraystretch}{1.5} % Ajuste l'espacement vertical
+    \begin{tabular}{|c|c|c|c|}
+        \hline
+        & \textbf{Élément A} & \textbf{Élément B} & \textbf{Élément C} \\ \hline
+        0 & BBBNBNN & BNBBNNN & NNNBBNB \\ \hline
+        1 & BBNNBBN & BNNBBNN & NNBBNNB \\ \hline
+        2 & BBNBBNN & BBNNBNN & NNBNNBB \\ \hline
+        3 & BNNNNBN & BNBBBNN & NBBBNNB \\ \hline
+        4 & BNBBBNN & BBNNNBN & NBNNBB \\ \hline
+        5 & BNNBBBN & BNNNBBN & NBBNNNB \\ \hline
+        6 & BBNBNNN & BBBNBNN & NBNBBNB \\ \hline
+        7 & BNNNBNN & BBNBBBN & NBBBNNB \\ \hline
+        8 & BNNBNNN & BBBBBNN & NBBNBBB \\ \hline
+        9 & BBBNBNN & BBNBNNN & NNNBNBB \\ \hline
+    \end{tabular}
+    \caption{Tableau des éléments et des séquences associées}
+    \label{tab:elements}
+\end{table}
 
-\subsubsection*{Détermination du dernier chiffre du code barre}
+Le résultat de cette analyse se traduit par une liste de 12 chiffres et d'une liste de 6 lettres (A ou B) déterminésde
+de la même façon que pour les chiffres avec le tableau précédent. Cette dernière permet de déterminer le premier chiffre du code-barres
+
+\subsubsection*{Détermination du premier chiffre du code barre}
 
 À partir des six premières valeurs obtenues, nous pouvons déterminer le premier chiffre. 
 Il suffit ainsi de lire le tableau de correspondance suivant :
@@ -150,7 +171,10 @@ Il suffit ainsi de lire le tableau de correspondance suivant :
 \end{table}
 
 \subsubsection*{Vérification de la clef de contrôle}
-
+Pour déterminer la clé de contrôle, il faut additionner les chiffres en positions paire à trois fois les
+les chiffres en positions impaires jusqu'au $12^{eme}$ chiffre. La clé est alors valable si son chiffre des
+unités est égal au complément à 10 du $13^{eme}$ chiffre du code.
+ 
 \section{Implémentation}
 
 \subsection{Phase 1 : Détection du code barre}
@@ -220,11 +244,6 @@ Le code barre est donc valide.
 	\caption{Détection du noir et blanc}
 	\label{fig:detection}
 \end{figure}
-
-
-\subsection{Détermination du dernier chiffre du code barre}
-
-\subsection{Vérification de la clef de contrôle}
 
 \section{Bilan de l'organisation}
 
