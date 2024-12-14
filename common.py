@@ -8,6 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def bornage(h, w, p): # à voir si une accélération est possible
+    p=list(p)
     if p[0] < 0:
         p[0] = 0
     if p[0] > h:

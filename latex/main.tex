@@ -91,101 +91,66 @@
 
 \section{Introduction}
 
-\subsection{Phase 1}
-\subsection{Phase 2}
-
 \section{Algorithmes}
 
-\subsection{Phase 1}
-\subsection{Phase 2}
-
-\section{Implémentation}
-
-\subsection{Phase 1}
-\subsection{Phase 2}
-
-\section{Résultats}
-
-\section {Phase 1 : Détection du code barre}
-
-\section{Phase 2 : Lecture du code barre}
+\subsection{Phase 1 : Détection du code barre}
+\subsection{Phase 2 : Lecture du code barre}
 
 La phase précédente a permis de récupérer un ensemble de couple de points représentant des rayons. 
 Pour chaque couple de points, nous déterminons d'une part les 13 valeurs du code barre, et d'autre part, s'il est valide ou non.
 
-\subsection{Seuillage de l'image avec Otsu}
-
-Avant cela, nous devons opérer un seuillage de l'image. Pour cela, nous utilisons la méthode d'Otsu.
-Cette méthode repose sur le calcul d'un seuil optimal pour binariser une image en niveaux de gris.
-Ce seuil est déterminé grâce à l'histogramme de l'image et est censé séparer les pixels en deux classes distinctes : les pixels noirs et les pixels blancs.
+\subsubsection*{Seuillage à l'aide d'Otsu}
+La méthode d'Otsu est une technique de seuillage utilisée en traitement d'images pour la segmentation binaire. 
+Elle vise à séparer les pixels d'une image en deux classes distinctes : l'avant-plan et l'arrière-plan. 
+L'algorithme d'Otsu fonctionne en cherchant le seuil de gris qui minimise la variance intra-classe, c'est-à-dire la somme des variances des deux classes. 
+Pour ce faire, il calcule l'histogramme des niveaux de gris de l'image et évalue la dispersion des pixels pour chaque seuil possible. 
+Le seuil optimal est celui qui maximise la variance inter-classe, assurant ainsi une séparation claire entre les deux classes. 
 En pratique, le seuil calculé devrait se situer entre les deux pics de l'histogramme.
 
-Pour la figure \ref{code_barre}, nous obtenons l'histogramme suivant :
-
-\begin{figure}[H] 
-	\centering
-	\includegraphics[width=0.5\textwidth]{images/histogramme.png}
-	\caption{Histogramme de l'image}
-	\label{histogramme}
-\end{figure}
-
-Grâce à ce seuil, nous obtenons ainsi l'image seuillée : 
-% Ajouter image seuillée avec Otsu
-
-\subsection{Détermination des limites du code-barres}
-
-Le rayon initial traverse potentiellement des zones inutiles de l'image. Il est donc essentiel de réduire ce segment pour que ses extrémités coïncident avec les bords du code-barres (les premières barres noires détectées).  
-Cette première étape est réalisée en échantillonnant l’image le long du segment défini, puis en appliquant un seuil de binarisation. Ce seuil est calculé grâce à l’algorithme d’Otsu.  
-
-\subsection{Binarisation de l'image}
-
-Prenons l'image suivante :
-
-\begin{figure}[H] % Ajouter les deux points reçu en argument 
-	\centering
-	\includegraphics[width=0.5\textwidth]{images/barcode0.jpg}
-	\caption{Image du code barre}
-	\label{code_barre}
-\end{figure}
-
-% Afficher l'image avec les deux points reçu en argument
-\begin{figure}[H] % Ajouter les deux points reçu en argument 
-	\centering
-	\includegraphics[width=0.5\textwidth]{images/code_barre_couple_vert.png}
-	\caption{Segment défini par le deux points en arguments}
-\end{figure}
-
+\subsubsection*{Détermination des limites du code-barres}
 La première étape de cette phase est de réduire ce rayon, de sorte que les deux nouveaux points correspondent à la première barre noire du code barre.
 Pour cela, nous devons tout d'abord opérer un seuillage de l'image grâce au seuil donné par l'algorithme d'otsu.
 Le segment est alors échantilloné en prenant le plus proches voisins. 
-Cet ensemble de points va alors être binarisé grâce au seuil.
+Cet ensemble de points va alors être binarisé grâce au seuil. C'est à dire que les points de valeurs inférieures au seuil vont valoir 1 et les autres vont valoir 0
 
-\begin{figure}[H] 
-	\centering
-	\includegraphics[width=0.5\textwidth]{images/binarisation.png}
-	\caption{Délimitation}
-	\label{fig:binarisation}
-\end{figure}
+Les points déterminant le début et la fin du code-barres sonclear
+t ensuite déterminés en prenant le premier et dernier point de valeur 0
 
-Les points déterminant le début et la fin du code-barres sont ensuite déterminés en prenant le premier et dernier point de valeur 0
-
-
-\begin{figure}[H] 
-	\centering
-	\includegraphics[width=0.5\textwidth]{images/detection.png}
-	\caption{Détection du noir et blanc}
-	\label{fig:detection}
-\end{figure}
-
-Finalement un dernier échantillonnage suivi d'une binarisation sur le même seuil permet de trouver la liste binaire à analyser
+Finalement un dernier échantillonnage suivi d'une binarisation sur le même seuil permet de trouver la liste binaire à analyser. Cette liste devant être compatible avec les hypotheses de données auxquelles nous allons le comparer, la binarisation ce fera dans le sens contraire de la première.
+C'est à dire que les points de valeurs inférieures au seuil vont valoir 0 tandis que les autres vont valoir 0.
 Le nombre de point échantillonnés est calculé en prenant $N=u*95$ avec u le plus petit multiple de 95 tel que u*95>L la longueur du segment du code barre
 
-\subsubsection{Analyser du code barre binaire}
+\subsubsection{Analyse du code barre binaire}
 La prochaine étape consiste à séparer les différents blocs contenu dans la liste binaire obtenu précédemment en ne gardant que ceux représentant des nombres
 Pour décoder chaque blocs, ils font être comparé avec des données de décodage en adaptant celle-ci à la taille du bloc 
-Le choix se fera en prenant la plus petit norme entre le bloc et les données comparés. 
+Le choix se fera en prenant la plus petit norme de la différence entre le bloc et les données comparés.
 
-\subsection{Détermination du dernier chiffre du code barre}
+\begin{table}[h!]
+    \centering
+    \renewcommand{\arraystretch}{1.5} % Ajuste l'espacement vertical
+    \begin{tabular}{|c|c|c|c|}
+        \hline
+        & \textbf{Élément A} & \textbf{Élément B} & \textbf{Élément C} \\ \hline
+        0 & BBBNBNN & BNBBNNN & NNNBBNB \\ \hline
+        1 & BBNNBBN & BNNBBNN & NNBBNNB \\ \hline
+        2 & BBNBBNN & BBNNBNN & NNBNNBB \\ \hline
+        3 & BNNNNBN & BNBBBNN & NBBBNNB \\ \hline
+        4 & BNBBBNN & BBNNNBN & NBNNBB \\ \hline
+        5 & BNNBBBN & BNNNBBN & NBBNNNB \\ \hline
+        6 & BBNBNNN & BBBNBNN & NBNBBNB \\ \hline
+        7 & BNNNBNN & BBNBBBN & NBBBNNB \\ \hline
+        8 & BNNBNNN & BBBBBNN & NBBNBBB \\ \hline
+        9 & BBBNBNN & BBNBNNN & NNNBNBB \\ \hline
+    \end{tabular}
+    \caption{Tableau des éléments et des séquences associées}
+    \label{tab:elements}
+\end{table}
+
+Le résultat de cette analyse se traduit par une liste de 12 chiffres et d'une liste de 6 lettres (A ou B) déterminésde
+de la même façon que pour les chiffres avec le tableau précédent. Cette dernière permet de déterminer le premier chiffre du code-barres
+
+\subsubsection*{Détermination du premier chiffre du code barre}
+
 À partir des six premières valeurs obtenues, nous pouvons déterminer le premier chiffre. 
 Il suffit ainsi de lire le tableau de correspondance suivant :
 
@@ -201,24 +166,120 @@ Il suffit ainsi de lire le tableau de correspondance suivant :
         AABBBA & 3 & ABABBA & 8 \\ \hline
         ABAABB & 4 & ABBABA & 9 \\ \hline
     \end{tabular}
-    \caption{Tableau des familles d’appartenance de la séquence}
+    \caption{Tableau des familles d’appartenance de la première séquence}
     \label{tab:sequence}
 \end{table}
 
-\subsection{Vérification de la clef de contrôle}
-Nous obtenons finalement pour cette image le code \textbf{4902030187590}, ce qui correspond bien au code barre présent sur l'image.
+\subsubsection*{Vérification de la clef de contrôle}
+Pour déterminer la clé de contrôle, il faut additionner les chiffres en positions paire à trois fois les
+les chiffres en positions impaires jusqu'au $12^{eme}$ chiffre. La clé est alors valable si son chiffre des
+unités est égal au complément à 10 du $13^{eme}$ chiffre du code.
+ 
+\section{Implémentation}
+
+\subsection{Phase 1 : Détection du code barre}
+
+\subsection{Phase 2 : Lecture du code barre}
+
+\section{Résultats}
+
+\subsection{Phase 1 : Détection du code barre}
+
+\subsection{Phase 2 : Lecture du code barre}
+
+\subsubsection*{Seuillage à l'aide d'Otsu}
+Prenons l'image suivante :
+\begin{figure}[H] % Ajouter les deux points reçu en argument 
+	\centering
+	\includegraphics[width=0.5\textwidth]{images/barcode0.jpg}
+	\caption{Image d'un code barre}
+	\label{code_barre}
+\end{figure}
+
+Avant cela de pouvoir lire un code barre, nous devons opérer un seuillage de l'image. Pour cela, nous utilisons la méthode d'Otsu.
+Cette méthode repose sur le calcul d'un seuil optimal pour binariser une image en niveaux de gris.
+Ce seuil est déterminé grâce à l'histogramme de l'image et est censé séparer les pixels en deux classes distinctes : les pixels noirs et les pixels blancs.
+
+Pour la figure \ref{code_barre}, nous obtenons l'histogramme suivant :
+
+\begin{figure}[H] 
+	\centering
+	\includegraphics[width=0.5\textwidth]{images/histogramme.png}
+	\caption{Histogramme de l'image}
+	\label{histogramme}
+\end{figure}
+
+Grâce à ce seuil, nous obtenons ainsi l'image seuillée : 
+\begin{figure}[H] 
+	\centering
+	\includegraphics[width=0.5\textwidth]{images/barcode_seuillee.png}
+	\caption{Image seuillée}
+	\label{img_seuillee}
+\end{figure}
+
+\subsubsection*{Détermination des limites du code-barres}
+\subsubsection*{Analyse du code barre binaire}
+\subsubsection*{Détermination du dernier chiffre du code barre}
+
+% Afficher l'image avec les deux points reçu en argument
+\begin{figure}[H] % Ajouter les deux points reçu en argument 
+	\centering
+	\includegraphics[width=0.5\textwidth]{images/code_barre_couple_vert.png}
+	\caption{Segment défini par le deux points en arguments}
+\end{figure}
+
+
+\begin{figure}[H] 
+	\centering
+	\includegraphics[width=0.5\textwidth]{images/binarisation.png}
+	\caption{Nouveau segment produit par l'échantillonnage et la binarisation}
+	\label{fig:binarisation}
+\end{figure}
+
+\subsubsection*{Analyse du code barre binaire}
+
+À partir du nouveau couple de points, on échantillonne une nouvelle fois le segment sur l'image seuillée. 
+On en déduit alors une liste de valeurs binaires. Ceci nous permet ainsi de détecter les zones noires et blanches du code-barres. 
+La figure \ref{fig:detection} illustre cette détection, où les zones noires sont représentées en rouge et les zones blanches en bleu.
+
+\begin{figure}[H] 
+	\centering
+	\includegraphics[width=0.5\textwidth]{images/code_seuille_couleur.png}
+	\caption{Détection du noir et blanc}
+	\label{fig:detection}
+\end{figure}
+
+\begin{figure}[H] 
+	\centering
+	\includegraphics[width=0.5\textwidth]{images/zoom_code_seuille_couleur.png}
+	\caption{Zoom de la détection}
+	\label{fig:detection_zoom}
+\end{figure}
+
+On souhaite noter ici que le décalage apparent sur l'image n'est que le résultat du dé-zoom de l'image.
+À petite échelle, on voit clairement que les zones sont bien détectées. 
+
+\subsubsection*{Détermination du premier chiffre du code barre}
+À l'aide de la séquence AB obtenue, nous pouvons ainsi déterminer le premier chiffre du code barre en se référant au tableau \ref{tab:sequence}.
+En l'occurrence, nous obtenons le chiffre \textbf{4} comme premier chiffre. 
+
+\subsubsection*{Vérification de la clef de contrôle}
+Nous obtenons alors pour cette image le code \textbf{4902030187590}, ce qui correspond bien au code barre présent sur l'image.
 De manière générale, il faut tout de même vérifier la validité du code barre. Pour cela, nous suivons l'algorithme de vérification de code barre grâce à la clé de contrôle.
 
 En l'occurrence, le complément à 10 du dernier chiffre du code barre vaut 0, tandis que le chiffre des unités de la somme des chiffres de rang impair et trois fois la somme des chiffres de rang pair vaut 0. 
 Le code barre est donc valide.
 
-\section{Mise en commun des deux phases}
+
+\newpage 
+
+\section{Conclusion}
 
 \section{Bilan de l'organisation}
 
 \subsection{Séance 1}
 
-\begin{table}[htbp]
+\begin{table}[H]
 	\centering 
 	\begin{tabular}{c|c|c}
 		& Tâches entreprises& Temps passé\\ \hline
@@ -232,12 +293,12 @@ Le code barre est donc valide.
 
 \subsection{Séance 2}
 
-\begin{table}[htbp]
+\begin{table}[H]
 	\centering 
 	\begin{tabular}{c|c|c}
 		& Tâches entreprises& Temps passé\\ \hline
 		Elisa& Finition de la méthode d'Otsu & 2h\\ \hline
-		Alban& & \\ \hline
+		Alban& Complétion de l'échantillonnage et de la binarisation, début du calcul des limites du code-barres et de la recherche de u& 2h\\ \hline
 		Tierno& & \\ \hline
 		David& & 
 	\end{tabular}
@@ -246,12 +307,12 @@ Le code barre est donc valide.
 
 \subsection{Séance 3}
 
-\begin{table}[htbp]
+\begin{table}[H]
 	\centering 
 	\begin{tabular}{c|c|c}
 		& Tâches entreprises& Temps passé\\ \hline
 		Elisa& Débuggage et mise en commun de toutes les fonctions de la phase 1 & 3h\\ \hline
-		Alban& & \\ \hline
+		Alban& Débuggage des fonctions de décodage des blocs fait chez soi et mise en commun du travail phase1& 3h\\ \hline
 		Tierno& & \\ \hline
 		David& & 
 	\end{tabular}
@@ -260,12 +321,12 @@ Le code barre est donc valide.
 
 \subsection{Séance 4}
 
-\begin{table}[htbp]
+\begin{table}[H]
 	\centering 
 	\begin{tabular}{c|c|c}
 		& Tâches entreprises& Temps passé\\ \hline
 		Elisa& & \\ \hline
-		Alban& & \\ \hline
+		Alban& Dernier débuggage et test sur des exemples pour vérifier l'efficacité du code& 3h\\ \hline
 		Tierno& & \\ \hline
 		David& & 
 	\end{tabular}
@@ -273,6 +334,18 @@ Le code barre est donc valide.
 \end{table}
 
 \subsection{Séance 5} % 13 Décembre 
+
+\begin{table}[H]
+	\centering 
+	\begin{tabular}{c|c|c}
+		& Tâches entreprises& Temps passé\\ \hline
+		Elisa& Rédaction du rapport & \\ \hline
+		Alban& Rédaction du rapport & \\ \hline
+		Tierno& & \\ \hline
+		David& & 
+	\end{tabular}
+	\caption{Organisation de la séance 5}
+\end{table}
 
 \newpage
 
