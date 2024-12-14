@@ -184,6 +184,23 @@ unités est égal au complément à 10 du $13^{eme}$ chiffre du code.
 Contrairement à la phase précédente, nous avons implémenté la phase 2 entièrement en programmation imprérative.
 Chaque étape clé de l'algorithme est implémentée par une fonction spécifique, tout en respectant les principes de modularité et de réutilisabilité du code.
 
+Les fonctions réutilisées sont : 
+\begin{itemize}
+	\item \texttt{distance} : Calcule la distance entre deux points.
+	\item \texttt{echantillonnage} : Échantillonne un segment pour un nombre de points donné.
+	\item \texttt{norme\_binaire} : ?
+\end{itemize}
+
+Les fonctions implémentées sont :
+\begin{itemize}
+	\item \textbf{Seuillage à l'aide d'Otsu} : La fonction \texttt{otsu} permet de seuiller une image en niveaux de gris en utilisant la méthode d'Otsu.
+	\item \textbf{Détermination des limites du code-barres} : La fonction \texttt{find\_lim} permet de déterminer les limites du code barre à partir d'un segment donné.
+	\item \textbf{Analyse du code barre binaire} : La fonction \texttt{find\u} permet de déterminer le facteur u pour échantillonner le second segment de code barre, 
+	et la fonction \texttt{separate} détermine les douze blocs de données (ignorant les gardes) à partir du segment seuillé. 
+	\item \textbf{Détermination du premier chiffre du code barre} : La fonction \texttt{first\_one} permet de déterminer le premier chiffre du code barre à partir de la séquence AB.
+	\item \textbf{Vérification de la clef de contrôle} : La fonction \texttt{clef\_controle} permet de vérifier la validité du code barre en calculant la clé de contrôle.
+\end{itemize}
+
 \section{Résultats}
 
 \subsection{Phase 1 : Détection du code barre}
@@ -222,6 +239,7 @@ Grâce à ce seuil dénoté par la barre rouge, nous obtenons ainsi l'image seui
 
 \subsubsection*{Détermination des limites du code-barres}
 Une fois le seuil déterminé, nous pouvons déterminer les limites du code barre.
+
 Nous recevons en argument deux points, qui définissent un segment sur l'image seuillée, comme représenté sur la figure \ref{fig:segment}.
 Nous souhaitons alors réduire ce segment pour ne garder que les deux points correspondant à la première barre noire du code barre.
 
@@ -255,6 +273,9 @@ La figure \ref{fig:detection} illustre cette détection, où les zones noires so
 	\label{fig:detection}
 \end{figure}
 
+Nous notons ici que le décalage apparent sur l'image n'est que le résultat du dé-zoom de l'image.
+À petite échelle, on voit clairement que les zones sont bien détectées (cf Figure \ref{fig:detection_zoom}). 
+
 \begin{figure}[H] 
 	\centering
 	\includegraphics[width=0.5\textwidth]{images/zoom_code_seuille_couleur.png}
@@ -262,15 +283,12 @@ La figure \ref{fig:detection} illustre cette détection, où les zones noires so
 	\label{fig:detection_zoom}
 \end{figure}
 
-On souhaite noter ici que le décalage apparent sur l'image n'est que le résultat du dé-zoom de l'image.
-À petite échelle, on voit clairement que les zones sont bien détectées. 
-
 \subsubsection*{Détermination du premier chiffre du code barre}
 À l'aide de la séquence AB obtenue, nous pouvons ainsi déterminer le premier chiffre du code barre en se référant au tableau \ref{tab:sequence}.
 En l'occurrence, nous obtenons le chiffre \textbf{4} comme premier chiffre. 
 
 \subsubsection*{Vérification de la clef de contrôle}
-Nous obtenons alors pour cette image le code \textbf{4902030187590}, ce qui correspond bien au code barre présent sur l'image.
+Nous obtenons alors pour cette image le code \textbf{4902030187590}, ce qui correspond bien au code barre présent sur l'image (cf Figure \ref{code_barre}).
 De manière générale, il faut tout de même vérifier la validité du code barre. Pour cela, nous suivons l'algorithme de vérification de code barre grâce à la clé de contrôle.
 
 En l'occurrence, le complément à 10 du dernier chiffre du code barre vaut 0, tandis que le chiffre des unités de la somme des chiffres de rang impair et trois fois la somme des chiffres de rang pair vaut 0. 
