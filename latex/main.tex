@@ -100,12 +100,12 @@ La phase précédente a permis de récupérer un ensemble de couple de points re
 Pour chaque couple de points, nous déterminons d'une part les 13 valeurs du code barre, et d'autre part, s'il est valide ou non.
 
 \subsubsection*{Seuillage à l'aide d'Otsu}
-La méthode d'Otsu est une technique de seuillage utilisée en traitement d'images pour la segmentation binaire. 
+La méthode d'Otsu est une technique de seuillage de Nobuyuki Otsu utilisée en traitement d'images pour la segmentation binaire. 
 Elle vise à séparer les pixels d'une image en deux classes distinctes : l'avant-plan et l'arrière-plan. 
-L'algorithme d'Otsu fonctionne en cherchant le seuil de gris qui minimise la variance intra-classe, c'est-à-dire la somme des variances des deux classes. 
+L'algorithme d'Otsu consiste à chercher le seuil de gris qui minimise la variance intra-classe, c'est-à-dire la somme des variances des deux classes. 
 Pour ce faire, il calcule l'histogramme des niveaux de gris de l'image et évalue la dispersion des pixels pour chaque seuil possible. 
 Le seuil optimal est celui qui maximise la variance inter-classe, assurant ainsi une séparation claire entre les deux classes. 
-En pratique, le seuil calculé devrait se situer entre les deux pics de l'histogramme.
+En pratique, le seuil calculé se situe entre les deux pics de l'histogramme.
 
 \subsubsection*{Détermination des limites du code-barres}
 La première étape de cette phase est de réduire ce rayon, de sorte que les deux nouveaux points correspondent à la première barre noire du code barre.
@@ -151,7 +151,7 @@ de la même façon que pour les chiffres avec le tableau précédent. Cette dern
 
 \subsubsection*{Détermination du premier chiffre du code barre}
 
-À partir des six premières valeurs obtenues, nous pouvons déterminer le premier chiffre. 
+À partir de la séquence AB obtenue, nous pouvons déterminer le premier chiffre. 
 Il suffit ainsi de lire le tableau de correspondance suivant :
 
 \begin{table}[h!]
@@ -180,6 +180,9 @@ unités est égal au complément à 10 du $13^{eme}$ chiffre du code.
 \subsection{Phase 1 : Détection du code barre}
 \subsection{Phase 2 : Lecture du code barre}
 
+Contrairement à la phase précédente, nous avons implémenté la phase 2 entièrement en programmation imprérative.
+Chaque étape clé de l'algorithme est implémentée par une fonction spécifique, tout en respectant les principes de modularité et de réutilisabilité du code.
+
 \section{Résultats}
 
 \subsection{Phase 1 : Détection du code barre}
@@ -195,20 +198,20 @@ Prenons l'image suivante :
 	\label{code_barre}
 \end{figure}
 
-Avant cela de pouvoir lire un code barre, nous devons opérer un seuillage de l'image. Pour cela, nous utilisons la méthode d'Otsu.
-Cette méthode repose sur le calcul d'un seuil optimal pour binariser une image en niveaux de gris.
-Ce seuil est déterminé grâce à l'histogramme de l'image et est censé séparer les pixels en deux classes distinctes : les pixels noirs et les pixels blancs.
+Avant de pouvoir lire un code barre, nous devons opérer un seuillage de l'image. Pour cela, nous utilisons la méthode d'Otsu.
+Pour rappel, cette méthode repose sur le calcul d'un seuil optimal pour binariser une image en niveaux de gris.
+Ce seuil est déterminé grâce à l'histogramme de l'image et sépare les pixels en deux classes distinctes : les pixels noirs et les pixels blancs.
 
-Pour la figure \ref{code_barre}, nous obtenons l'histogramme suivant :
+Pour l'image en figure \ref{code_barre}, nous obtenons l'histogramme suivant :
 
 \begin{figure}[H] 
 	\centering
 	\includegraphics[width=0.5\textwidth]{images/histogramme.png}
-	\caption{Histogramme de l'image}
+	\caption{Histogramme de la luminance de l'image}
 	\label{histogramme}
 \end{figure}
 
-Grâce à ce seuil, nous obtenons ainsi l'image seuillée : 
+Grâce à ce seuil dénoté par la barre rouge, nous obtenons ainsi l'image seuillée : 
 \begin{figure}[H] 
 	\centering
 	\includegraphics[width=0.5\textwidth]{images/barcode_seuillee.png}
@@ -217,13 +220,19 @@ Grâce à ce seuil, nous obtenons ainsi l'image seuillée :
 \end{figure}
 
 \subsubsection*{Détermination des limites du code-barres}
+Une fois le seuil déterminé, nous pouvons déterminer les limites du code barre.
+Nous recevons en argument deux points, qui définissent un segment sur l'image seuillée, comme représenté sur la figure \ref{fig:segment}.
+Nous souhaitons alors réduire ce segment pour ne garder que les deux points correspondant à la première barre noire du code barre.
 
-\begin{figure}[H] % Ajouter les deux points reçu en argument 
+% TODO : changer les images en images seuillées
+\begin{figure}[H] 
 	\centering
 	\includegraphics[width=0.5\textwidth]{images/code_barre_couple_vert.png}
 	\caption{Segment défini par le deux points en arguments}
+	\label{fig:segment}
 \end{figure}
 
+Nous obtenons alors le nouveau segment rouge sur l'image seuillée, comme illustré sur la figure \ref{fig:binarisation} : 
 
 \begin{figure}[H] 
 	\centering
