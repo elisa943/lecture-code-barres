@@ -9,7 +9,7 @@ from common import bornage,bornage2
 
 
 class Blob:
-    def __init__(self, pixels=None,imsize=None, X=None,Y=None, barycentre=None, valeurs_propres=None, vecteurs_propres=None,area=None,axis=None):
+    def __init__(self, pixels=None,imsize=None, X=None,Y=None, barycentre=None, valeurs_propres=None, vecteurs_propres=None,area=None,axis=None,longueur=None):
         # Arguments indispensables
         self.pixels = pixels 
         self.imsize=imsize
@@ -21,6 +21,7 @@ class Blob:
         self.vecteurs_propres = vecteurs_propres 
         self.area=area
         self.axis=axis
+        self.longueur=longueur
     def calc_XY(self):
         self.X,self.Y=self.pixels[:,0],self.pixels[:,1]
         return self.X,self.Y
@@ -36,6 +37,14 @@ class Blob:
     def calc_area(self): # pour éventuellement appliquer un critère de sélaction surla taille du bousin
         self.area=self.pixels.size # not the real area, but a good measure of how large it is
         return self.area
+    # def calc_longueur(self):
+    #     if self.longueur==None:
+    #         p1 = floor(self.barycentre[1]+self.valeurs_propres[0]/2*self.vecteurs_propres[0][0]), floor(self.barycentre[0]+self.valeurs_propres[0]/2*self.vecteurs_propres[0][1])
+    #         p2 = floor(self.barycentre[1]-self.valeurs_propres[0]/2*self.vecteurs_propres[0][0]), floor(self.barycentre[0]-self.valeurs_propres[0]/2*self.vecteurs_propres[0][1])
+    #         self.axis=[p1,p2]
+    #     return self.axis
+    
+    
     def calc_all(self):
         try:
             self.calc_XY()
@@ -46,12 +55,47 @@ class Blob:
             print(e)
             return False
         
+    def calc_axis2(self):
+        self.calc_all()
+        if self.axis==None:
+            if self.valeurs_propres[0]<self.valeurs_propres[1]:
+                p1 = floor(self.barycentre[1]+self.valeurs_propres[0]/2*self.vecteurs_propres[0][0]), floor(self.barycentre[0]+self.valeurs_propres[0]/2*self.vecteurs_propres[0][1])
+                p2 = floor(self.barycentre[1]-self.valeurs_propres[0]/2*self.vecteurs_propres[0][0]), floor(self.barycentre[0]-self.valeurs_propres[0]/2*self.vecteurs_propres[0][1])
+                self.axis=[p1,p2]
+            else:
+                p1 = floor(self.barycentre[1]+self.valeurs_propres[1]/2*self.vecteurs_propres[1][0]), floor(self.barycentre[0]+self.valeurs_propres[1]/2*self.vecteurs_propres[1][1])
+                p2 = floor(self.barycentre[1]-self.valeurs_propres[1]/2*self.vecteurs_propres[1][0]), floor(self.barycentre[0]-self.valeurs_propres[1]/2*self.vecteurs_propres[1][1])
+                self.axis=[p1,p2]
+        return self.axis
+    
     def calc_axis(self):
         self.calc_all()
         if self.axis==None:
-            p1 = floor(self.barycentre[1]+self.valeurs_propres[0]/2*self.vecteurs_propres[0][0]), floor(self.barycentre[0]+self.valeurs_propres[0]/2*self.vecteurs_propres[0][1])
-            p2 = floor(self.barycentre[1]-self.valeurs_propres[0]/2*self.vecteurs_propres[0][0]), floor(self.barycentre[0]-self.valeurs_propres[0]/2*self.vecteurs_propres[0][1])
-            self.axis=[p1,p2]
+            max_l=max(self.imsize)
+            if self.valeurs_propres[0]<self.valeurs_propres[1]:
+                vecteurs_propres_norm=self.vecteurs_propres[0]/np.linalg.norm(self.vecteurs_propres[0])
+                p1 = floor(self.barycentre[1]+max_l*vecteurs_propres_norm[0]), floor(self.barycentre[0]+max_l*vecteurs_propres_norm[1])
+                p2 = floor(self.barycentre[1]-max_l*vecteurs_propres_norm[0]), floor(self.barycentre[0]-max_l*vecteurs_propres_norm[1])
+                print("------------------------------------")
+                print(p1)
+                print(p2)
+                p1=bornage(self.imsize[1],self.imsize[0],p1)
+                p2=bornage(self.imsize[1],self.imsize[0],p2)
+                print(p1)
+                print(p2)
+                self.axis=[p1,p2]
+            else:
+                vecteurs_propres_norm=self.vecteurs_propres[1]/np.linalg.norm(self.vecteurs_propres[1])
+                p1 = floor(self.barycentre[1]+max_l*vecteurs_propres_norm[0]), floor(self.barycentre[0]+max_l*vecteurs_propres_norm[1])
+                p2 = floor(self.barycentre[1]-max_l*vecteurs_propres_norm[0]), floor(self.barycentre[0]-max_l*vecteurs_propres_norm[1])
+                print("--------------------------------------------")
+                print(p1)
+                print(p2)
+                p1=bornage(self.imsize[1],self.imsize[0],p1)
+                p2=bornage(self.imsize[1],self.imsize[0],p2)
+                print(p1)
+                print(p2)
+                self.axis=[p1,p2]
         return self.axis
         
     def draw_random_rays(self):

@@ -178,6 +178,7 @@ unités est égal au complément à 10 du $13^{eme}$ chiffre du code.
 \section{Implémentation}
 
 \subsection{Phase 1 : Détection du code barre}
+
 \subsection{Phase 2 : Lecture du code barre}
 
 Contrairement à la phase précédente, nous avons implémenté la phase 2 entièrement en programmation imprérative.
@@ -269,7 +270,7 @@ On souhaite noter ici que le décalage apparent sur l'image n'est que le résult
 En l'occurrence, nous obtenons le chiffre \textbf{4} comme premier chiffre. 
 
 \subsubsection*{Vérification de la clef de contrôle}
-Nous obtenons finalement pour cette image le code \textbf{4902030187590}, ce qui correspond bien au code barre présent sur l'image.
+Nous obtenons alors pour cette image le code \textbf{4902030187590}, ce qui correspond bien au code barre présent sur l'image.
 De manière générale, il faut tout de même vérifier la validité du code barre. Pour cela, nous suivons l'algorithme de vérification de code barre grâce à la clé de contrôle.
 
 En l'occurrence, le complément à 10 du dernier chiffre du code barre vaut 0, tandis que le chiffre des unités de la somme des chiffres de rang impair et trois fois la somme des chiffres de rang pair vaut 0. 

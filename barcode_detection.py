@@ -84,7 +84,7 @@ def barcode_detection(img,sigma_g,sigma_t,seuil,sigma_bruit=2,affichage=False):
     print(f"{num_labels} objects detected in img")
     coords=[x.coords for x in blobs]
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Extraction de l'axe ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Blobs=[Blob(pixels=x.coords) for x in blobs]
+    Blobs=[Blob(pixels=x.coords,imsize=[h,w]) for x in blobs]
     axis=[b.calc_axis() for b in Blobs]
     #============================================================================================================
     plt.figure()
@@ -182,21 +182,23 @@ def barcode_detection(img,sigma_g,sigma_t,seuil,sigma_bruit=2,affichage=False):
 # %%
 img="img/barcode0.jpg"
 # Pour le bruit, à regler à la main (2 c pas mal)
-sigma_bruit = 2
+sigma_bruit = 3
 
 # Pour le gradient, relativement faible pour trouver les vecteurs de transition correspondant aux barres
-sigma_g = 2 
+sigma_g = 2
 
 # Pour le tenseur, relativement élevé pour trouer des clusters de vecteurs gradient
-sigma_t = 50
+sigma_t = 100
 
-seuil = 0.7 
+seuil = 0.5
 print(os.listdir("img"))
 # u=barcode_detection("img/code_barre_prof.jpg",1,15,0.7,2,affichage=False)
-u=barcode_detection("img/barcode0.jpg",sigma_g=2,sigma_t=10,seuil=0.7,sigma_bruit=2)
+u=barcode_detection(img,sigma_g,sigma_t,seuil,sigma_bruit=2)
 for blob in u:
     print(blob.barycentre)
     print(blob.axis)
+    print("Vp:")
+    print(blob.valeurs_propres)
     o=blob.axis
     blob.__repr__()
     
