@@ -72,6 +72,8 @@ class Blob:
         # print(axe_norm)
         # print(alpha)
         # print(r)
+        print(self.valeurs_propres[imax])
+        print(self.valeurs_propres)
         return self.axis
         
     # def draw_random_rays(self):

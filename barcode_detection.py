@@ -192,14 +192,15 @@ sigma_t = 50
 
 seuil = 0.7 
 # print(os.listdir("img"))
-# u=barcode_detection("img/code_barre_prof.jpg",1,15,0.7,2,affichage=False)
-u=barcode_detection("img/barcode0.jpg",sigma_g=2,sigma_t=50,seuil=0.7,sigma_bruit=2)
+u=barcode_detection("img/code_barre_prof.jpg",1,15,0.7,2,affichage=False)
+# u=barcode_detection("img/barcode0.jpg",sigma_g=2,sigma_t=50,seuil=0.7,sigma_bruit=2)
+# u=barcode_detection("img/b1.jpg",2,50,0.7,2,affichage=False)
 for blob in u:
     print(blob.barycentre)
     print(blob.axis)
     o=blob.axis
     # blob.__repr__()
     
-# u=barcode_detection("img/b1.jpg",2,50,0.7,2,affichage=False)
+
 
 print(f"Code exécuté en {round(time()-start_time,3)} s")
