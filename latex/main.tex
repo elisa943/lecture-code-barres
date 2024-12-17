@@ -218,8 +218,7 @@ Grâce à ce seuil, nous obtenons ainsi l'image seuillée :
 \end{figure}
 
 \subsubsection*{Détermination des limites du code-barres}
-\subsubsection*{Analyse du code barre binaire}
-\subsubsection*{Détermination du dernier chiffre du code barre}
+La première étape consiste à un échantillonnage sur un segment puis une binarisation selon un seuil. Ce segment est visble en vert sur la figure suivante.
 
 % Afficher l'image avec les deux points reçu en argument
 \begin{figure}[H] % Ajouter les deux points reçu en argument 
@@ -228,6 +227,8 @@ Grâce à ce seuil, nous obtenons ainsi l'image seuillée :
 	\caption{Segment défini par le deux points en arguments}
 \end{figure}
 
+Ensuite la recherche des limites du code-barres amènent à un nouveau segment entre les deux limites, représenté par le segment rouge sur la figure suivante. Celle-ci montre l'efficacité
+de la recherche de limites qui correspondent bien à celles observables sur l'image ci-dessous.
 
 \begin{figure}[H] 
 	\centering
@@ -238,7 +239,6 @@ Grâce à ce seuil, nous obtenons ainsi l'image seuillée :
 
 \subsubsection*{Analyse du code barre binaire}
 
-À partir du nouveau couple de points, on échantillonne une nouvelle fois le segment sur l'image seuillée. 
 On en déduit alors une liste de valeurs binaires. Ceci nous permet ainsi de détecter les zones noires et blanches du code-barres. 
 La figure \ref{fig:detection} illustre cette détection, où les zones noires sont représentées en rouge et les zones blanches en bleu.
 
