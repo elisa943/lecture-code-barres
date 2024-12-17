@@ -7,6 +7,7 @@ Created on Thu Dec 12 18:58:05 2024
 import numpy as np
 
 def bornage(h, w, p): # à voir si une accélération est possible
+    p=list(p)
     if p[0] < 0:
         p[0] = 0
     if p[0] > h:
