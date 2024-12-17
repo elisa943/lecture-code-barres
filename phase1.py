@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import cv2
-from time import time 
+import time
 
 def otsu(img, bins=255, displayHisto=False):
     luminance = None
@@ -175,7 +175,7 @@ def clef_controle(decode):
     return clef == complement
 
 def phase1(x, y, img, seuil):
-    starttime = time()
+    starttime = time.perf_counter()
     
     x1 = x[0]
     y1 = y[0]
@@ -190,13 +190,13 @@ def phase1(x, y, img, seuil):
     # Binarisation
     xd,yd,xa,ya = find_lim(x1,y1,x2,y2,img,seuil)
 
-    
+    '''
     plt.figure()
     plt.imshow(img, cmap='gray')
     #plt.plot([xd, xa], [yd, ya], 'ro-')
     plt.plot([x1, x2], [y1, y2], 'go-')
     plt.show()
-    
+    '''    
     
     # Echantillonage + Binarisation de l'image après seuillage 
     segment_seuillage, u = find_u(xd,yd,xa,ya,img,seuil)
@@ -216,7 +216,7 @@ def phase1(x, y, img, seuil):
     # Vérification de la clé de contrôle
     if clef_controle(code_barre):
         print("Code barre valide : ", code_barre)
-        endtime = time() - starttime
+        endtime = time.perf_counter() - starttime
         print("Temps d'exécution : ", endtime)
         return code_barre
     else:

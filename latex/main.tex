@@ -110,7 +110,7 @@ En pratique, le seuil calculé se situe entre les deux pics de l'histogramme.
 \subsubsection*{Détermination des limites du code-barres}
 La première étape de cette phase est de réduire ce rayon, de sorte que les deux nouveaux points correspondent à la première barre noire du code barre.
 Pour cela, nous devons tout d'abord opérer un seuillage de l'image grâce au seuil donné par l'algorithme d'otsu.
-Le segment est alors échantilloné en prenant le plus proches voisins. 
+
 Cet ensemble de points va alors être binarisé grâce au seuil. C'est à dire que les points de valeurs inférieures au seuil vont valoir 1 et les autres vont valoir 0
 
 Les points déterminant le début et la fin du code-barres sonclear
@@ -187,18 +187,20 @@ Chaque étape clé de l'algorithme est implémentée par une fonction spécifiqu
 Les fonctions réutilisées sont : 
 \begin{itemize}
 	\item \texttt{distance} : Calcule la distance entre deux points.
-	\item \texttt{echantillonnage} : Échantillonne un segment pour un nombre de points donné.
-	\item \texttt{norme\_binaire} : ?
+	\item \texttt{echantillonnage} : Échantillonne un segment pour un nombre de points donné en choisissant le plus proche voisins avec np.around.
+	\item \texttt{norme\_binaire} : Calcul la norme binaire entre les blocs binaires du code-barres et les séquences à comparer. Cette norme se traduit dans l'implémentation par une comparaison bit à bit.
 \end{itemize}
 
 Les fonctions implémentées sont :
 \begin{itemize}
 	\item \textbf{Seuillage à l'aide d'Otsu} : La fonction \texttt{otsu} permet de seuiller une image en niveaux de gris en utilisant la méthode d'Otsu.
-	\item \textbf{Détermination des limites du code-barres} : La fonction \texttt{find\_lim} permet de déterminer les limites du code barre à partir d'un segment donné.
-	\item \textbf{Analyse du code barre binaire} : La fonction \texttt{find\u} permet de déterminer le facteur u pour échantillonner le second segment de code barre, 
-	et la fonction \texttt{separate} détermine les douze blocs de données (ignorant les gardes) à partir du segment seuillé. 
+	\item \textbf{Détermination des limites du code-barres} : La fonction \texttt{find\_lim} permet de déterminer les limites du code barre à partir d'un segment donné. 
+	La fonction \texttt{find\_u} permet de déterminer le facteur u pour échantillonner le second segment de code barre.
+	\item \textbf{Analyse du code barre binaire} : La fonction \texttt{separate} détermine les douze blocs de données (ignorant les gardes) à partir du segment seuillé et les placent dans un tableau, facilitant alors le déchiffrement. 
+	La fonction \texttt{compare} va alors utiliser la fonction \texttt{norme\_binaire} pour comparer chaque bloc binaire du tableau sortant de \texttt{separate} et permttre de récupérere les 12 chiffres décodés et une liste contenant la séquence AB.
 	\item \textbf{Détermination du premier chiffre du code barre} : La fonction \texttt{first\_one} permet de déterminer le premier chiffre du code barre à partir de la séquence AB.
 	\item \textbf{Vérification de la clef de contrôle} : La fonction \texttt{clef\_controle} permet de vérifier la validité du code barre en calculant la clé de contrôle.
+	Elle est calculé par le produit scalaire avec le vecteur [1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3]. De plus, nous avons utilisé un modulo 10 sur le complément à 10 pour prendre en compte que le complement à 10 de 0 est 0.
 \end{itemize}
 
 \section{Résultats}
@@ -252,12 +254,8 @@ Nous souhaitons alors réduire ce segment pour ne garder que les deux points cor
 	\label{fig:segment}
 \end{figure}
 
-<<<<<<< HEAD
-Ensuite la recherche des limites du code-barres amènent à un nouveau segment entre les deux limites, représenté par le segment rouge sur la figure suivante. Celle-ci montre l'efficacité
-de la recherche de limites qui correspondent bien à celles observables sur l'image ci-dessous.
-=======
-Nous obtenons alors le nouveau segment rouge sur l'image seuillée, comme illustré sur la figure \ref{fig:binarisation} : 
->>>>>>> 81ba943e1c8b47182bb30e92161ffccbaabb7e30
+Ensuite, la recherche des limites du code-barres amènent à un nouveau segment entre les deux limites. 
+Nous obtenons alors le nouveau segment entre les points en rouge sur l'image seuillée, comme illustré sur la figure \ref{fig:binarisation} : 
 
 \begin{figure}[H] 
 	\centering
@@ -265,6 +263,9 @@ Nous obtenons alors le nouveau segment rouge sur l'image seuillée, comme illust
 	\caption{Nouveau segment produit par l'échantillonnage et la binarisation}
 	\label{fig:binarisation}
 \end{figure}
+
+Celle-ci montre l'efficacité
+de la recherche de limites qui correspondent bien à celles observables sur l'image ci-dessus.
 
 \subsubsection*{Analyse du code barre binaire}
 
