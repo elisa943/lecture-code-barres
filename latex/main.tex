@@ -90,6 +90,12 @@
 % ------------------------------------------------ %
 
 \section{Introduction}
+Le projet présenté dans ce rapport s'intéresse à la lecture automatique des codes-barres à partir d'images. 
+L'objectif principal est de développer un algorithme capable de détecter et de lire un code-barres en utilisant des techniques de traitement d'image.
+
+D'abord, nous détaillerons les algorithmes utilisés pour la détection et la lecture du code-barres. 
+Ensuite, nous expliquerons l'implémentation de ces algorithmes, puis présenterons les résultats obtenus illustrés par des exemples d'images traitées. 
+Enfin, nous conclurons sur les performances globales.
 
 \section{Algorithmes}
 
@@ -196,6 +202,8 @@ Les fonctions réutilisées sont :
 Les fonctions implémentées sont :
 \begin{itemize}
 	\item \textbf{Seuillage à l'aide d'Otsu} : La fonction \texttt{otsu} permet de seuiller une image en niveaux de gris en utilisant la méthode d'Otsu.
+	D'abord, l'algorithme crée un histogramme de l'image. Ensuite, il parcourt tous les seuils possibles (de 0 à 255 dans notre cas), puis met à jour les valeurs des probabilités de classe et des moyennes de classe. 
+	Dès lors, il calcule la variance inter-classe et vérifie itérativement s'il est maximal. En effet, minimiser la variance intra-classe revient à maximiser la variance inter-classe.
 	\item \textbf{Détermination des limites du code-barres} : La fonction \texttt{find\_lim} permet de déterminer les limites du code barre à partir d'un segment donné. 
 	La fonction \texttt{find\_u} permet de déterminer le facteur u pour échantillonner le second segment de code barre.
 	\item \textbf{Analyse du code barre binaire} : La fonction \texttt{separate} détermine les douze blocs de données (ignorant les gardes) à partir du segment seuillé et les placent dans un tableau, facilitant alors le déchiffrement. 
@@ -248,7 +256,6 @@ La première étape consiste à un échantillonnage sur un segment puis une bina
 Nous recevons en argument deux points, qui définissent un segment sur l'image seuillée, comme représenté sur la figure \ref{fig:segment}.
 Nous souhaitons alors réduire ce segment pour ne garder que les deux points correspondant à la première barre noire du code barre.
 
-% TODO : changer les images en images seuillées
 \begin{figure}[H] 
 	\centering
 	\includegraphics[width=0.5\textwidth]{images/code_barre_couple_vert.png}
@@ -266,8 +273,7 @@ Nous obtenons alors le nouveau segment entre les points en rouge sur l'image seu
 	\label{fig:binarisation}
 \end{figure}
 
-Celle-ci montre l'efficacité
-de la recherche de limites qui correspondent bien à celles observables sur l'image ci-dessus.
+Celle-ci montre l'efficacité de la recherche de limites qui correspondent bien à celles observables sur l'image ci-dessus.
 
 \subsubsection*{Analyse du code barre binaire}
 
@@ -357,7 +363,7 @@ Le code barre est donc valide.
 	\centering 
 	\begin{tabular}{c|c|c}
 		& Tâches entreprises& Temps passé\\ \hline
-		Elisa& & \\ \hline
+		Elisa& Dernier débuggage et test sur des exemples pour vérifier l'efficacité du code& 3h\\ \hline
 		Alban& Dernier débuggage et test sur des exemples pour vérifier l'efficacité du code& 3h\\ \hline
 		Tierno& & \\ \hline
 		David& & 
