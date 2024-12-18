@@ -108,17 +108,16 @@ Le seuil optimal est celui qui maximise la variance inter-classe, assurant ainsi
 En pratique, le seuil calculé se situe entre les deux pics de l'histogramme.
 
 \subsubsection*{Détermination des limites du code-barres}
-La première étape de cette phase est de réduire ce rayon, de sorte que les deux nouveaux points correspondent à la première barre noire du code barre.
-Pour cela, nous devons tout d'abord opérer un seuillage de l'image grâce au seuil donné par l'algorithme d'otsu.
+La première étape de cette phase est de réduire le segment initial, de sorte que les deux nouveaux points correspondent à la première barre noire du code barre.
+Pour cela, nous devons tout d'abord opérer un seuillage de l'image grâce au seuil donné par l'algorithme d'Otsu.
 
-Cet ensemble de points va alors être binarisé grâce au seuil. C'est à dire que les points de valeurs inférieures au seuil vont valoir 1 et les autres vont valoir 0
+Cet ensemble de points va alors être binarisé grâce au seuil. C'est à dire que les points de l'image ayant une valeur inférieure au seuil vont être associés à 0 et ceux ayant une valeur supérieure au seuil vont être associés à 1.
 
-Les points déterminant le début et la fin du code-barres sonclear
-t ensuite déterminés en prenant le premier et dernier point de valeur 0
+Les points déterminant le début et la fin du code-barres sont ensuite déterminés en prenant le premier et dernier point de valeur 0.
 
-Finalement un dernier échantillonnage suivi d'une binarisation sur le même seuil permet de trouver la liste binaire à analyser. Cette liste devant être compatible avec les hypotheses de données auxquelles nous allons le comparer, la binarisation ce fera dans le sens contraire de la première.
-C'est à dire que les points de valeurs inférieures au seuil vont valoir 0 tandis que les autres vont valoir 0.
-Le nombre de point échantillonnés est calculé en prenant $N=u*95$ avec u le plus petit multiple de 95 tel que u*95>L la longueur du segment du code barre
+Finalement, un dernier échantillonnage suivi d'une binarisation sur le même seuil permet de trouver la liste binaire à analyser. Cette liste devant être compatible avec les hypotheses de données auxquelles nous allons la comparer, la binarisation ce fera dans le sens contraire de la première.
+C'est à dire que les points de valeurs inférieures au seuil vont valoir 1 tandis que les autres vont valoir 0.
+Le nombre de point échantillonnés est calculé en prenant $N=u*95$ avec u le plus petit multiple de 95 tel que u*95>L avec L la longueur du segment du code barre
 
 \subsubsection{Analyse du code barre binaire}
 La prochaine étape consiste à séparer les différents blocs contenu dans la liste binaire obtenu précédemment en ne gardant que ceux représentant des nombres

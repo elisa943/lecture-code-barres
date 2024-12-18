@@ -73,16 +73,16 @@ def find_lim(x1,y1,x2,y2,img,seuil):
     valeurs_img=np.zeros((len(X), 1))
 
     for i in range(0,len(X)):
-        valeurs_img[i]=(img[Y[i], X[i]]) <= seuil
+        valeurs_img[i]=(img[Y[i], X[i]]) >= seuil
     i1=0
     i2=0
 
     for i in range(0,len(valeurs_img)):
-        if valeurs_img[i]==1:
+        if valeurs_img[i]==0:
             i1=i
             break
     for i in range(len(valeurs_img)-1,1,-1):
-        if valeurs_img[i]==1:
+        if valeurs_img[i]==0:
             i2=i
             break
     return X[i1],Y[i1],X[i2],Y[i2] # xd,yd,xa,ya
