@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import cv2
 import time
 
-def otsu(img, bins=255, displayHisto=False):
+def otsu(img, bins=255):
     luminance = None
     
     # Si l'image est en couleur (3 dimensions)
@@ -43,16 +43,6 @@ def otsu(img, bins=255, displayHisto=False):
         
         wB += histogram_dic[k]
         sumB += (k-1) * histogram_dic[k] # A vérifier si c'est k ou k-1
-    
-    # Afficher l'histogramme
-    if displayHisto:
-        plt.figure()
-        plt.hist(luminance, bins=bins, range=(0, 255))
-        plt.axvline(level, color='r')
-        plt.title("Histogramme de la luminance")
-        plt.xlabel("Luminance")
-        plt.ylabel("Fréquence")
-        plt.show()
     
     return level
 
