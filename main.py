@@ -18,9 +18,7 @@ def main():
     # y = [465, 798]
     for blob in Blobs:
         # altérer la méthode de clcul de l'axe si besoin (blob.calc_axis_...)
-        y,x = blob.axis
-        y=y[::-1]
-        x=x[::-1]
+        x,y = blob.axis
         print("Axe: ",end="")
         print(blob.axis)
         print(phase1(x, y, img, seuil))
