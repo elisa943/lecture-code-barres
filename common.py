@@ -52,6 +52,14 @@ def random_ray_center(h, w, length):
     x2 = center-offset
     return np.int32([bornage(h, w, x1), bornage(h, w, x2)])
 
+def random_ray_center_2(h, w, length,center):
+    # méthode: centre, angle, longueur
+    angle = np.random.uniform(0, 2*np.pi)
+    r = length/2
+    offset = np.array([np.cos(angle), np.sin(angle)])*r
+    x1 = center+offset
+    x2 = center-offset
+    return np.int32([bornage(h, w, x1), bornage(h, w, x2)])
 
 def random_ray(h, w, length):
     # méthode: extrémité1, angle, longueur
@@ -65,9 +73,19 @@ def random_ray(h, w, length):
 
 
 def plot_ray(ray):
+    # for debugging
     plt.figure()
     plt.plot(ray[:,0],ray[:,1])
     k=5
     plt.plot(k * np.array([1, 1, -1, -1, 1]), k * np.array([1, -1, -1, 1, 1]))
     plt.grid()
     return
+
+
+def get_angle(ray):
+    ray=np.array(ray)
+    print(ray)
+    axe=np.abs(ray[:,1]-ray[:,0]) #abs pour être sûr d'extraire l'angle avec l'horizontale
+    axe_norm=axe/np.linalg.norm(axe,2) 
+    alpha=np.arccos(axe_norm[0]) # on extrait l'angle avec l'horizontale
+    return alpha

@@ -84,13 +84,16 @@ def barcode_detection(img,sigma_g,sigma_t,seuil,sigma_bruit=2,affichage=False):
     print(f"{num_labels} objects detected in img")
     coords=[x.coords for x in blobs]
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Extraction de l'axe ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
     # en utilisant la méthode vectorielle
-    Blobs=[Blob(pixels=x.coords) for x in blobs]
-    axis=[b.calc_axis_ray(6) for b in Blobs]
-    # by feeding the img size
     Blobs=[Blob(pixels=x.coords,imsize=[h,w]) for x in blobs]
-    axis=[b.calc_axis() for b in Blobs]
+    axis=[b.calc_axis_ray(6) for b in Blobs]
+    
+    # Methode des points extrêmes
+    # Blobs=[Blob(pixels=x.coords,imsize=[h,w]) for x in blobs]
+    # axis=[b.calc_axis_extr() for b in Blobs]
     #============================================================================================================
+    # affichage basique des rayons obtenus
     plt.figure()
     plt.subplot(1, 2, 1)
     plt.imshow(img_code_barre)
@@ -179,13 +182,12 @@ def barcode_detection(img,sigma_g,sigma_t,seuil,sigma_bruit=2,affichage=False):
         # aff=[b.__repr__() for b in Blobs]
         
         plt.show()
-
-    
+        
     return Blobs
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ TEST DE L'EXTRACTION ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # %%
 img="img/barcode0.jpg"
-# Pour le bruit, à regler à la main (2 c pas mal)
+# Pour le bruit, à regler à la main (2 est un bon point de départ)
 sigma_bruit = 3
 
 # Pour le gradient, relativement faible pour trouver les vecteurs de transition correspondant aux barres
@@ -195,10 +197,8 @@ sigma_g = 2
 sigma_t = 100
 
 seuil = 0.7 
-# print(os.listdir("img"))
-print(os.listdir("img"))
-u=barcode_detection(img,sigma_g,sigma_t,seuil,sigma_bruit=2)
-u=barcode_detection("img/code_barre_prof.jpg",1,15,0.7,2,affichage=False)
+u=barcode_detection(img,sigma_g,sigma_t,seuil=0.5,sigma_bruit=2)
+# u=barcode_detection("img/code_barre_prof.jpg",1,15,0.7,2,affichage=False)
 # u=barcode_detection("img/barcode0.jpg",sigma_g=2,sigma_t=50,seuil=0.7,sigma_bruit=2)
 # u=barcode_detection("img/b1.jpg",2,50,0.7,2,affichage=False)
 for blob in u:
@@ -209,6 +209,4 @@ for blob in u:
     o=blob.axis
     # blob.__repr__()
     
-
-
 print(f"Code exécuté en {round(time()-start_time,3)} s")
