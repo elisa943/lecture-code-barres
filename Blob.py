@@ -31,7 +31,7 @@ class Blob:
         self.valeurs_propres,self.vecteurs_propres=np.linalg.eig(np.cov(self.X,self.Y))
         return self.valeurs_propres,self.vecteurs_propres
 
-    def calc_area(self): # pour éventuellement appliquer un critère de sélaction surla taille du bousin
+    def calc_area(self): # pour éventuellement appliquer un critère de sélection surla taille du bousin
         self.area=self.pixels.size # not the real area, but a good measure of how large it is
         return self.area
 
@@ -45,8 +45,7 @@ class Blob:
             print(e)
             return False
         
-    def calc_axis2(self):
-        
+    def calc_axis_0(self):
         self.calc_all()
         if self.axis==None:
             if self.valeurs_propres[0]<self.valeurs_propres[1]:
@@ -68,25 +67,15 @@ class Blob:
                 vecteurs_propres_norm=self.vecteurs_propres[0]/np.linalg.norm(self.vecteurs_propres[0])
                 p1 = floor(self.barycentre[1]+max_l*vecteurs_propres_norm[0]), floor(self.barycentre[0]+max_l*vecteurs_propres_norm[1])
                 p2 = floor(self.barycentre[1]-max_l*vecteurs_propres_norm[0]), floor(self.barycentre[0]-max_l*vecteurs_propres_norm[1])
-                print("------------------------------------")
-                print(p1)
-                print(p2)
                 p1=bornage(self.imsize[1],self.imsize[0],p1)
                 p2=bornage(self.imsize[1],self.imsize[0],p2)
-                print(p1)
-                print(p2)
                 self.axis=[p1,p2]
             else:
                 vecteurs_propres_norm=self.vecteurs_propres[1]/np.linalg.norm(self.vecteurs_propres[1])
                 p1 = floor(self.barycentre[1]+max_l*vecteurs_propres_norm[0]), floor(self.barycentre[0]+max_l*vecteurs_propres_norm[1])
                 p2 = floor(self.barycentre[1]-max_l*vecteurs_propres_norm[0]), floor(self.barycentre[0]-max_l*vecteurs_propres_norm[1])
-                print("--------------------------------------------")
-                print(p1)
-                print(p2)
                 p1=bornage(self.imsize[1],self.imsize[0],p1)
                 p2=bornage(self.imsize[1],self.imsize[0],p2)
-                print(p1)
-                print(p2)
                 self.axis=[p1,p2]
         return self.axis
     
@@ -106,11 +95,10 @@ class Blob:
         return self.axis
         
     def draw_random_rays(self,length,n):
-        # print(length, n)
         self.calc_all()
         return [random_ray_center_2(self.imsize[0], self.imsize[1], length, self.barycentre) for i in range(n)]
     
-    # @property
+    #pour la représentation des Blobs
     def __repr__(self):
         plt.figure()
         p1,p2 = self.calc_axis()
@@ -120,7 +108,6 @@ class Blob:
         w=floor((max(self.X)+1-min(self.X))*k)
         print((h,w))
         I=np.zeros((w,h))
-        # I[self.barycentre[0]-min(self.X)+floor(w/4),self.barycentre[1]-min(self.Y)+floor(h/4)]=3
         # affichage du Blob
         I[self.X-min(self.X)+floor(w/4),self.Y-min(self.Y)+floor(h/4)]=1
         # Affichage des points de l'axe

@@ -67,9 +67,7 @@ def barcode_detection(img,sigma_g,sigma_t,seuil,sigma_bruit=2,affichage=False):
     N_I_y = I_y/N_delta_I
 
     # ~~~~~~~~~~~~~~~~~~~ tenseur de structure local T ~~~~~~~~~~~~~~~~~~~
-
     gauss2D = G_2D(sigma_t)
-
     Txx = fftconvolve(N_I_x * N_I_x, gauss2D, mode='same')
     Tyy = fftconvolve(N_I_y * N_I_y, gauss2D, mode='same')
     Txy = fftconvolve(N_I_x * N_I_y, gauss2D, mode='same')
@@ -85,7 +83,7 @@ def barcode_detection(img,sigma_g,sigma_t,seuil,sigma_bruit=2,affichage=False):
     coords=[x.coords for x in blobs]
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Extraction de l'axe ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
-    # en utilisant la méthode vectorielle
+    # En utilisant la méthode vectorielle
     Blobs=[Blob(pixels=x.coords,imsize=[h,w]) for x in blobs]
     axis=[b.calc_axis_ray(6) for b in Blobs]
     
@@ -104,7 +102,7 @@ def barcode_detection(img,sigma_g,sigma_t,seuil,sigma_bruit=2,affichage=False):
         p=blob.barycentre
         plt.plot(p[1],p[0],"or",markersize=2.5)
         plt.plot(x,y,"+b",markersize=5)
-    plt.title("img origine")
+    plt.title("img originale")
     plt.subplot(1, 2, 2)
     plt.imshow(D_labeled, cmap=cm.BrBG_r)
     for blob in Blobs:
@@ -114,7 +112,7 @@ def barcode_detection(img,sigma_g,sigma_t,seuil,sigma_bruit=2,affichage=False):
         p=blob.barycentre
         plt.plot(p[1],p[0],"or",markersize=2.5)
         plt.plot(x,y,"+b",markersize=5)
-    plt.title("img labelisee")
+    plt.title("img labélisée")
     plt.colorbar()
     # aff=[b.__repr__() for b in Blobs]
     plt.show()
@@ -197,16 +195,18 @@ sigma_g = 2
 sigma_t = 100
 
 seuil = 0.7 
-u=barcode_detection(img,sigma_g,sigma_t,seuil=0.5,sigma_bruit=2)
-# u=barcode_detection("img/code_barre_prof.jpg",1,15,0.7,2,affichage=False)
+# u=barcode_detection(img,sigma_g,sigma_t,seuil=0.5,sigma_bruit=2)
+u=barcode_detection("img/code_barre_prof.jpg",1,15,0.7,2,affichage=False)
 # u=barcode_detection("img/barcode0.jpg",sigma_g=2,sigma_t=50,seuil=0.7,sigma_bruit=2)
 # u=barcode_detection("img/b1.jpg",2,50,0.7,2,affichage=False)
 for blob in u:
+    print("Barycentre: ",end="")
     print(blob.barycentre)
+    print("Axe: ",end="")
     print(blob.axis)
-    print("Vp:")
+    print("Valeurs propres: ",end="")
     print(blob.valeurs_propres)
     o=blob.axis
     # blob.__repr__()
-    
+
 print(f"Code exécuté en {round(time()-start_time,3)} s")
