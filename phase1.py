@@ -1,9 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import cv2
-from time import time 
+import time
 
-def otsu(img, bins=255, displayHisto=False):
+def otsu(img, bins=255):
     luminance = None
     
     # Si l'image est en couleur (3 dimensions)
@@ -44,16 +44,6 @@ def otsu(img, bins=255, displayHisto=False):
         wB += histogram_dic[k]
         sumB += (k-1) * histogram_dic[k] # A vérifier si c'est k ou k-1
     
-    # Afficher l'histogramme
-    if displayHisto:
-        plt.figure()
-        plt.hist(luminance, bins=bins, range=(0, 255))
-        plt.axvline(level, color='r')
-        plt.title("Histogramme de la luminance")
-        plt.xlabel("Luminance")
-        plt.ylabel("Fréquence")
-        plt.show()
-    
     return level
 
 def distance(x1,y1,x2,y2):
@@ -73,16 +63,16 @@ def find_lim(x1,y1,x2,y2,img,seuil):
     valeurs_img=np.zeros((len(X), 1))
 
     for i in range(0,len(X)):
-        valeurs_img[i]=(img[Y[i], X[i]]) <= seuil
+        valeurs_img[i]=(img[Y[i], X[i]]) >= seuil
     i1=0
     i2=0
 
     for i in range(0,len(valeurs_img)):
-        if valeurs_img[i]==1:
+        if valeurs_img[i]==0:
             i1=i
             break
     for i in range(len(valeurs_img)-1,1,-1):
-        if valeurs_img[i]==1:
+        if valeurs_img[i]==0:
             i2=i
             break
     return X[i1],Y[i1],X[i2],Y[i2] # xd,yd,xa,ya
@@ -175,7 +165,7 @@ def clef_controle(decode):
     return clef == complement
 
 def phase1(x, y, img, seuil):
-    starttime = time()
+    starttime = time.perf_counter()
     
     x1 = x[0]
     y1 = y[0]
@@ -192,11 +182,11 @@ def phase1(x, y, img, seuil):
 
     
     plt.figure()
-    plt.imshow(img, cmap='gray')
-    #plt.plot([xd, xa], [yd, ya], 'ro-')
+    plt.imshow(img < seuil, cmap='gray')
+    plt.plot([xd, xa], [yd, ya], 'ro-')
     plt.plot([x1, x2], [y1, y2], 'go-')
     plt.show()
-    
+
     
     # Echantillonage + Binarisation de l'image après seuillage 
     segment_seuillage, u = find_u(xd,yd,xa,ya,img,seuil)
@@ -216,7 +206,7 @@ def phase1(x, y, img, seuil):
     # Vérification de la clé de contrôle
     if clef_controle(code_barre):
         print("Code barre valide : ", code_barre)
-        endtime = time() - starttime
+        endtime = time.perf_counter() - starttime
         print("Temps d'exécution : ", endtime)
         return code_barre
     else:
