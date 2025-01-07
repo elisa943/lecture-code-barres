@@ -1,0 +1,693 @@
+%----------------------------------------------------------------------------------------
+%  PACKAGES AND CONFIGURATION
+%----------------------------------------------------------------------------------------
+
+\documentclass{rapport}
+\usepackage{geometry}
+\usepackage{fancyhdr} % For custom headers
+\usepackage{lastpage} % To determine the last page for the footer
+\usepackage{float}
+\usepackage{extramarks} % For headers and footers
+\usepackage[most]{tcolorbox} % For problem answer sections
+\usepackage{graphicx} % For inserting images
+\usepackage{xcolor} % For link coloring
+\usepackage[hidelinks]{hyperref} % For URL links (no box or color name) 
+\usepackage{amsmath}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+%Ce que moi(Alban) ai rajouté comme package
+\usepackage{comment} 
+\usepackage{multicol} % Pour les colonnes
+\usepackage{listings}
+\usepackage{courier}
+\usepackage{subcaption}
+
+\definecolor{backcolour}{RGB}{47,47,47}
+\definecolor{violet}{RGB}{200,20,200}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{marron}{RGB}{150,100,70}
+\definecolor{red2}{RGB}{207,43,58}
+\definecolor{bordeaux}{RGB}{74,31,30}
+\lstdefinestyle{mystyle}{
+    language=Python,
+    basicstyle=\tiny\ttfamily
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{violet},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{red},
+    literate={,}{{\textcolor{red}{,}}}1
+             {;}{{\textcolor{red}{;}}}1,
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2,
+    literate=
+  {á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+  {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
+  {à}{{\`a}}1 {è}{{\`e}}1 {ì}{{\`i}}1 {ò}{{\`o}}1 {ù}{{\`u}}1
+  {À}{{\`A}}1 {È}{{\'E}}1 {Ì}{{\`I}}1 {Ò}{{\`O}}1 {Ù}{{\`U}}1
+  {ä}{{\"a}}1 {ë}{{\"e}}1 {ï}{{\"i}}1 {ö}{{\"o}}1 {ü}{{\"u}}1
+  {Ä}{{\"A}}1 {Ë}{{\"E}}1 {Ï}{{\"I}}1 {Ö}{{\"O}}1 {Ü}{{\"U}}1
+  {â}{{\^a}}1 {ê}{{\^e}}1 {î}{{\^i}}1 {ô}{{\^o}}1 {û}{{\^u}}1
+  {Â}{{\^A}}1 {Ê}{{\^E}}1 {Î}{{\^I}}1 {Ô}{{\^O}}1 {Û}{{\^U}}1
+  {œ}{{\oe}}1 {Œ}{{\OE}}1 {æ}{{\ae}}1 {Æ}{{\AE}}1 {ß}{{\ss}}1
+  {ű}{{\H{u}}}1 {Ű}{{\H{U}}}1 {ő}{{\H{o}}}1 {Ő}{{\H{O}}}1
+  {ç}{{\c c}}1 {Ç}{{\c C}}1 {ø}{{\o}}1 {å}{{\r a}}1 {Å}{{\r A}}1
+  {€}{{\EUR}}1 {£}{{\pounds}}1
+}
+
+\title{TS229}
+\newcommand{\figsize}{1\textwidth}
+\begin{document}
+
+%----------- Informations du rapport ---------
+\logo{images/logo_em.jpg}
+\unif{École nationale supérieure d'électronique, informatique, télécommunications, mathématiques et mécanique de Bordeaux}
+\titre{Lecture de code-barres par lancers aléatoires de rayons}
+\cours{Département Télécom} %Nom du cours
+\sujet{TS225 : Projet Images} %Nom du sujet
+\enseignant{Marc \textsc{DONIAS}}
+\eleves{Elisa \textsc{Chien} \\
+		Alban \textsc{Oberti} \\
+		Tierno-Alpha \textsc{Tall} \\
+		David \textsc{Yan} 
+		}
+
+%----------------------------------------------------------------------------------------
+%   TITLE PAGE
+%----------------------------------------------------------------------------------------
+\fairemarges %Afficher les marges
+\fairepagedegarde %Créer la page de garde
+\newpage
+\tabledematieres %Créer la table de matières
+\newpage
+% ------------------------------------------------ %
+
+\section{Introduction}
+Le projet présenté dans ce rapport s'intéresse à la lecture automatique des codes-barres à partir d'images. 
+L'objectif principal est de développer un algorithme capable de détecter et de lire un code-barres en utilisant des techniques de traitement d'image.
+
+D'abord, nous détaillerons les algorithmes utilisés pour la détection et la lecture du code-barres. 
+Ensuite, nous expliquerons l'implémentation de ces algorithmes, puis présenterons les résultats obtenus illustrés par des exemples d'images traitées. 
+Enfin, nous conclurons sur les performances globales.
+
+\section{Algorithmes}
+
+\subsection{Phase 1 : Détection du code barre}
+\subsection{Phase 2 : Lecture du code barre}
+
+La phase précédente a permis de récupérer un ensemble de couple de points représentant des rayons. 
+Pour chaque couple de points, nous déterminons d'une part les 13 valeurs du code barre, et d'autre part, nous vérifions s'il est valide ou non.
+
+\subsubsection*{Seuillage à l'aide d'Otsu}
+La méthode d'Otsu est une technique de seuillage de Nobuyuki Otsu utilisée en traitement d'images pour la segmentation binaire. 
+Elle vise à séparer les pixels d'une image en deux classes distinctes : l'avant-plan et l'arrière-plan. 
+Pour ce faire, on construit l'histogramme des niveaux de gris de l'image et évalue la dispersion des pixels pour chaque seuil possible. 
+Le seuil optimal est celui qui maximise la variance inter-classe, assurant ainsi une séparation claire entre les deux classes. 
+En pratique, le seuil calculé se situe entre les deux pics de l'histogramme.
+
+\subsubsection*{Détermination des limites du code-barres}
+La première étape de cette phase est de réduire le segment initial, de sorte que les deux nouveaux points correspondent à la première barre noire du code barre.
+Pour cela, nous devons tout d'abord opérer un seuillage de l'image grâce au seuil donné par l'algorithme d'Otsu.
+
+Cet ensemble de points va alors être binarisé grâce au seuil. C'est à dire que les points de l'image ayant une valeur inférieure au seuil vont être associés à 0 et ceux ayant une valeur supérieure au seuil vont être associés à 1.
+
+Les points déterminant le début et la fin du code-barres sont ensuite déterminés en prenant le premier et dernier point de valeur 0.
+
+Finalement, un dernier échantillonnage suivi d'une binarisation sur le même seuil permet de trouver la liste binaire à analyser. Cette liste devant être compatible avec les hypotheses de données auxquelles nous allons la comparer, la binarisation ce fera dans le sens contraire de la première.
+C'est à dire que les points de valeurs inférieures au seuil vont valoir 1 tandis que les autres vont valoir 0.
+Le nombre de point échantillonnés est calculé en prenant $N=u*95$ avec u le plus petit multiple de 95 tel que u*95>L avec L la longueur du segment du code barre
+
+\subsubsection*{Analyse du code barre binaire}
+La prochaine étape consiste à séparer les différents blocs contenu dans la liste binaire obtenu précédemment en ne gardant que ceux représentant des nombres
+Pour décoder chaque blocs, ils font être comparé avec des données de décodage en adaptant celle-ci à la taille du bloc 
+Le choix se fera en prenant la plus petit norme de la différence entre le bloc et les données comparés.
+
+\begin{table}[h!]
+    \centering
+    \renewcommand{\arraystretch}{1.5} % Ajuste l'espacement vertical
+    \begin{tabular}{|c|c|c|c|}
+        \hline
+        & \textbf{Élément A} & \textbf{Élément B} & \textbf{Élément C} \\ \hline
+        0 & BBBNBNN & BNBBNNN & NNNBBNB \\ \hline
+        1 & BBNNBBN & BNNBBNN & NNBBNNB \\ \hline
+        2 & BBNBBNN & BBNNBNN & NNBNNBB \\ \hline
+        3 & BNNNNBN & BNBBBNN & NBBBNNB \\ \hline
+        4 & BNBBBNN & BBNNNBN & NBNNBB \\ \hline
+        5 & BNNBBBN & BNNNBBN & NBBNNNB \\ \hline
+        6 & BBNBNNN & BBBNBNN & NBNBBNB \\ \hline
+        7 & BNNNBNN & BBNBBBN & NBBBNNB \\ \hline
+        8 & BNNBNNN & BBBBBNN & NBBNBBB \\ \hline
+        9 & BBBNBNN & BBNBNNN & NNNBNBB \\ \hline
+    \end{tabular}
+    \caption{Tableau des éléments et des séquences associées}
+    \label{tab:elements}
+\end{table}
+
+Le résultat de cette analyse se traduit par une liste de 12 chiffres et d'une liste de 6 lettres (A ou B) déterminésde
+de la même façon que pour les chiffres avec le tableau précédent. Cette dernière permet de déterminer le premier chiffre du code-barres
+
+\subsubsection*{Détermination du premier chiffre du code barre}
+
+À partir de la séquence AB obtenue, nous pouvons déterminer le premier chiffre. 
+Il suffit ainsi de lire le tableau de correspondance suivant :
+
+\begin{table}[h!]
+    \centering
+    \renewcommand{\arraystretch}{1.5} % Ajuste l'espacement vertical
+    \begin{tabular}{|c|c|c|c|}
+        \hline
+        \textbf{Séquence} & \textbf{1\textsuperscript{er} Chiffre} & \textbf{Séquence} & \textbf{1\textsuperscript{er} Chiffre} \\ \hline
+        AAAAAA & 0 & ABBAAB & 5 \\ \hline
+        AABABB & 1 & ABBBAA & 6 \\ \hline
+        AABBAB & 2 & ABABAB & 7 \\ \hline
+        AABBBA & 3 & ABABBA & 8 \\ \hline
+        ABAABB & 4 & ABBABA & 9 \\ \hline
+    \end{tabular}
+    \caption{Tableau des familles d’appartenance de la séquence}
+    \label{tab:sequence}
+\end{table}
+
+\subsubsection*{Vérification de la clef de contrôle}
+Pour déterminer la clé de contrôle, il faut additionner les chiffres en positions paires à trois fois la somme des
+chiffres en positions impaires jusqu'au $12^{eme}$ chiffre. 
+La clé est alors valable si le chiffre des unités est égal au complément à 10 du $13^{eme}$ chiffre du code.
+
+\section{Implémentation}
+\subsection{Phase 1 : Détection du code barre}
+\subsubsection*{Image}
+À partir d'une image en couleur RGB, nous la convertissons en YCbCr et ne gardons que le canal de luminance. En effet, un code-barre est une alternance de bandes noires et blanches, donc seul ce contraste d'intensité nous intéresse.
+\newline On ajoute d'ailleurs un bruit blanc gaussien centré de variance $\sigma_{bruit}^2$ dès le chargement de l'image. Cela améliore la capacité de détection.
+
+\subsubsection*{Mesure de cohérence}
+\label{sec:coherence}
+Pour le calcul de la mesure de cohérence, nous devons tout d'abord calculer les vecteurs gradients d'intensité. Pour cela, nous les calculons au moyen des filtres de Canny, ce qui correspond à appliquer un filtre convolutif gaussien avec un écart type $\sigma_g$. Cet écart type doit être relativement faible pour trouver les vecteurs de transition correspondant aux barres blanches et noires.
+
+Ensuite, nous calculons la fonction de pondération du voisinage à l'aide d'un filtre passe-bas gaussien, avec un écart type $\sigma_t$. Cet écart type doit être proportionnel à la taille du code-barre par rapport à la taille de l'image pour trouver des clusters de vecteurs gradient d'intensité.
+
+\subsubsection*{Labélisation}
+La labélisation des objets détectés dans l'image binaire est réalisée à l'aide de la fonction \texttt{measure.label} de la bibliothèque \texttt{skimage}. Cette fonction attribue un label unique à chaque blob extrait par le biais des étapes précédentes, permettant ainsi de les distinguer et de les analyser individuellement. À l'aide de celle-ci, nous obtenons une image labélisée accompagnée du nombre total d'objets détectés. Finalement, on obtient le nuage de points correspondant à toutes les régions potentiellement intéressantes qui ont été détectées.
+
+De plus, pour éviter d'avoir des zones d'intérêt parasites, on rajoute sur l'image d'origine, avant le traitement d'image, un bruit blanc gaussien pour réduire la qualité de l'image. En effet, ce bruit va perturber les zones de faux positifs sans trop perturber le code-barre puisque sa structure est très contrastée.
+
+\subsubsection*{Classe Blob}
+Une fois les différentes régions extraites de l'image, il nous fallait être en capacité de tracer des rayons pour la lecture. C'est dans cet esprit que nous avons implémenté une classe \textit{Blob}. Celle-ci fournit une interface qui permet à l'utilisateur d'obtenir toutes les données utiles relatives à un blob sans qu'il ait à se soucier de l'implémentation. Ceci nous permet de produire un code plus synthétique et de fluidifier l'échange entre les deux équipes de projet.
+\newline \newline Une instance de \textit{Blob} contient une batterie d'attributs nécessaires au calcul des éléments essentiels pour le tracé : on peut citer le barycentre, la matrice de covariance, ses valeurs et vecteurs propres, etc. Ces attributs sont accompagnés de méthodes qui implémentent plusieurs approches pour le tracé d'un rayon sur un blob donné. On peut par exemple tracer des rayons aléatoires qui passent par le barycentre du blob, ou un rayon de taille adéquate aligné sur l'axe du code-barre tout en étant capable d'ajuster sa longueur pour tenir compte de la déformation induite par le processus d'extraction des zones d'intérêt.
+\newline \newline On peut aussi, à travers cette interface, aisément ajouter des méthodes de calcul qui permettraient d'affiner la détection : par exemple, pour utiliser d'autres approches pour le calcul du rayon, ou l'ajout de filtres sur la forme du blob pour quantifier une probabilité qu'il soit ou non un code-barre. Elle présente aussi l'avantage d'être simple d'utilisation : l'utilisateur fournit la taille d'une image et un nuage de points en son sein en entrée, et peut ensuite directement obtenir les données qui lui sont utiles.
+
+\subsubsection*{Complexité temporelle}
+Nous nous sommes efforcés de produire un code relativement efficace en termes de complexité temporelle.\newline
+Initialement, celui-ci se terminait en une trentaine de secondes. 
+Nous avons utilisé, dès que possible, des calculs matriciels plutôt que des boucles imbriquées, et fait un usage extensif des fonctionnalités de \textit{numpy}, qui fournit des fonctions efficaces pour les calculs d'algèbre linéaire. Le changement le plus impactant a été l'ajout de la fonction \textit{fftconvolve} de \textit{scipy}, qui tire parti de l'algorithme de la Transformée de Fourier Rapide pour effectuer des convolutions en un temps record.
+\newline Ces améliorations nous ont permis d'atteindre une exécution de l'ordre d'une seconde.
+
+\subsection{Phase 2 : Lecture du code barre}
+
+Contrairement à la phase précédente, nous avons implémenté la phase 2 entièrement en programmation impérative.
+Chaque étape clé de l'algorithme est implémentée par une fonction spécifique, tout en respectant les principes de modularité et de réutilisabilité du code.
+
+\vspace{0.5cm}
+
+Les fonctions réutilisées sont : 
+\begin{itemize}
+	\item \texttt{distance} : Calcule la distance entre deux points.
+	\item \texttt{echantillonnage} : Échantillonne un segment pour un nombre de points donné en choisissant le plus proche voisins avec np.around.
+	\item \texttt{norme\_binaire} : Calcule la norme binaire entre les blocs binaires du code-barres et les séquences à comparer. Cette norme se traduit dans l'implémentation par une comparaison bit à bit.
+\end{itemize}
+
+\vspace{0.5cm}
+
+Les fonctions implémentées sont :
+\begin{itemize}
+	\item \textbf{Seuillage à l'aide d'Otsu} : La fonction \texttt{otsu} permet de seuiller une image en niveaux de gris en utilisant la méthode d'Otsu.
+	D'abord, l'algorithme crée un histogramme de l'image. Ensuite, il parcourt tous les seuils possibles (de 0 à 255 dans notre cas), puis met à jour les valeurs des probabilités de classe et des moyennes de classe. 
+	Dès lors, il calcule la variance inter-classe et vérifie itérativement s'il est maximal. En effet, minimiser la variance intra-classe revient à maximiser la variance inter-classe.
+	\item \textbf{Détermination des limites du code-barres} : La fonction \texttt{find\_lim} permet de déterminer les limites du code barre à partir d'un segment donné. 
+	La fonction \texttt{find\_u} permet de déterminer le facteur u pour échantillonner le second segment de code barre.
+	\item \textbf{Analyse du code barre binaire} : La fonction \texttt{separate} détermine les douze blocs de données (ignorant les gardes) à partir du segment seuillé et les placent dans un tableau, facilitant alors le déchiffrement. 
+	La fonction \texttt{compare} va alors utiliser la fonction \texttt{norme\_binaire} pour comparer chaque bloc binaire du tableau sortant de \texttt{separate} et permettre de récupérer les 12 chiffres décodés et une liste contenant la séquence AB.
+	\item \textbf{Détermination du premier chiffre du code barre} : La fonction \texttt{first\_one} permet de déterminer le premier chiffre du code barre à partir de la séquence AB.
+	\item \textbf{Vérification de la clef de contrôle} : La fonction \texttt{clef\_controle} permet de vérifier la validité du code barre en calculant la clé de contrôle.
+	Elle est calculée par le produit scalaire avec le vecteur [1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3]. De plus, nous avons utilisé un modulo 10 sur le complément à 10 pour prendre en compte que le complément à 10 de 0 est 0.
+\end{itemize}
+
+\section{Résultats}
+
+\subsection{Phase 1 : Détection du code barre}
+
+\begin{figure}[H] 
+	\centering
+	\includegraphics[width=\figsize]{images/Detection/Y.png}
+	\caption{Image originale et canal de Luminance}
+	\label{Y}
+\end{figure}
+Nous convertissons l'image couleur RGB en image canal Y pour ne garder que l'intensité du contraste. Cela nous permet de bien distinguer les bandes noires et blanches.
+\begin{figure}[H] 
+	\centering
+	\includegraphics[width=\figsize]{images/Detection/gradients.png}
+	\caption{Gradients en X et en Y}
+	\label{grad}
+\end{figure}
+A partir du canal de luminance, nous calculons le vecteur gradient selon x et selon y. Pour vérifier qu'il s'agit du gradient selon, nous observons dans l'image à gauche, que l'on observe bien la variation horizontale d'intensité à la coordonnée (1200,1000), on donc bien un gradient selon x. Et pour l'image de droite, nous observons une variation verticale au coordonnée (0,750), donc on a un gradient selon y.
+\begin{figure}[H] 
+	\centering
+	\includegraphics[width=\figsize]{images/Detection/normalisation.png}
+	\caption{Normalisation des gradients}
+	\label{norm}
+\end{figure}
+La normalisation permet d'appuyer les transitions de pixel pour faciliter la détection des codes barres et permet d'avoir un tenseur de structure local bien contrasté. 
+\begin{figure}[H] 
+	\centering
+	\includegraphics[width=\figsize]{images/Detection/tenseur.png}
+	\caption{Visualisation des composantes du tenseur de structure local}
+	\label{tenseur}
+\end{figure}
+En observant le tenseur Txy, on peut observer la zone du code barre très contrasté par rapport au reste de l'image.
+
+\begin{figure}[H]  
+	\centering
+	\includegraphics[width=\figsize]{images/Detection/mesure_coherence_seuil.png}
+	\caption{Mesure de cohérence et seuillage }
+	\label{seuil}
+\end{figure}
+La mesure de cohérence seuillée met en évidence une région d'interet, qui correspond à la zone où le code barre se situe. Nous effectuons un seuillage pour mettre en évidence la zone d'interêt et ainsi faciliter la labélisation.
+\begin{figure}[H]  
+	\centering
+	\includegraphics[width=\figsize]{images/Detection/img_labeled.png}
+	\caption{Labélisation et tracé de rayon}
+	\label{seuil}
+\end{figure}
+En choisissant des paramètres adéquats:
+%$\sigma_g=2$,$\sigma_t=50$,$seuil=0.7$, $sigma_{bruit}=2$
+$$\sigma_g = 2, \quad \sigma_t = 50, \quad \text{seuil} = 0.7, \quad \sigma_{\text{bruit}} = 2$$
+On est obtient un tracé de rayon pertinent.
+\newline Ces paramètres sont différents pour chaque image et doivent respecter les conditions citées en \ref{sec:coherence}
+\begin{figure}[H]  
+	\centering
+	\includegraphics[width=\figsize]{images/Detection/manyblobs.png}
+	\caption{Labélisation et tracé de rayon}
+	\label{seuil}
+\end{figure}
+Si les paramètres de détection ne sont pas bien choisis, des régions parasites font surface. Ici:
+%$\sigma_g=2$,$\sigma_t=50$,$seuil=0.7$, $sigma_{bruit}=2$
+$$\sigma_g = 5, \quad \sigma_t = 30, \quad \text{seuil} = 0.7, \quad \sigma_{\text{bruit}} = 2$$
+
+\subsection{Phase 2 : Lecture du code barre}
+
+\subsubsection*{Seuillage à l'aide d'Otsu}
+Prenons l'image suivante :
+\begin{figure}[H] % Ajouter les deux points reçu en argument 
+	\centering
+	\includegraphics[width=0.5\textwidth]{images/barcode0.jpg}
+	\caption{Image d'un code barre}
+	\label{code_barre}
+\end{figure}
+
+Avant de pouvoir lire un code barre, nous devons opérer un seuillage de l'image. Pour cela, nous utilisons la méthode d'Otsu.
+Pour rappel, cette méthode repose sur le calcul d'un seuil optimal pour binariser une image en niveaux de gris.
+Ce seuil est déterminé grâce à l'histogramme de l'image et sépare les pixels en deux classes distinctes : les pixels noirs et les pixels blancs.
+
+Pour l'image en figure \ref{code_barre}, nous obtenons l'histogramme suivant :
+
+\begin{figure}[H] 
+	\centering
+	\includegraphics[width=0.5\textwidth]{images/histogramme.png}
+	\caption{Histogramme de la luminance de l'image}
+	\label{histogramme}
+\end{figure}
+
+Grâce à ce seuil dénoté par la barre rouge, nous obtenons ainsi l'image seuillée : 
+\begin{figure}[H] 
+	\centering
+	\includegraphics[width=0.5\textwidth]{images/barcode_seuillee.png}
+	\caption{Image seuillée}
+	\label{img_seuillee}
+\end{figure}
+
+\subsubsection*{Détermination des limites du code-barres}
+Une fois le seuil déterminé, nous pouvons déterminer les limites du code barre.
+La première étape consiste à un échantillonnage sur un segment puis une binarisation selon un seuil. Ce segment est visble en vert sur la figure suivante.
+
+Nous recevons en argument deux points, qui définissent un segment sur l'image seuillée, comme représenté sur la figure \ref{fig:segment}.
+Nous souhaitons alors réduire ce segment pour ne garder que les deux points correspondant à la première barre noire du code barre.
+
+\begin{figure}[H] 
+	\centering
+	\includegraphics[width=0.5\textwidth]{images/code_barre_couple_vert.png}
+	\caption{Segment défini par le deux points en arguments}
+	\label{fig:segment}
+\end{figure}
+
+Ensuite, la recherche des limites du code-barres amènent à un nouveau segment entre les deux limites. 
+Nous obtenons alors le nouveau segment entre les points en rouge sur l'image seuillée, comme illustré sur la figure \ref{fig:binarisation} : 
+
+\begin{figure}[H] 
+	\centering
+	\includegraphics[width=0.5\textwidth]{images/binarisation.png}
+	\caption{Nouveau segment produit par l'échantillonnage et la binarisation}
+	\label{fig:binarisation}
+\end{figure}
+
+Celle-ci montre l'efficacité de la recherche de limites qui correspondent bien à celles observables sur l'image ci-dessus.
+
+\subsubsection*{Analyse du code barre binaire}
+
+On en déduit alors une liste de valeurs binaires. Ceci nous permet ainsi de détecter les zones noires et blanches du code-barres. 
+La figure \ref{fig:detection} illustre cette détection, où les zones noires sont représentées en rouge et les zones blanches en bleu.
+
+\begin{figure}[H] 
+	\centering
+	\includegraphics[width=0.5\textwidth]{images/code_seuille_couleur.png}
+	\caption{Détection du noir et blanc}
+	\label{fig:detection}
+\end{figure}
+
+Nous notons ici que le décalage apparent sur l'image n'est que le résultat du dé-zoom de l'image.
+À petite échelle, on voit clairement que les zones sont bien détectées (cf Figure \ref{fig:detection_zoom}). 
+
+\begin{figure}[H] 
+	\centering
+	\includegraphics[width=0.5\textwidth]{images/zoom_code_seuille_couleur.png}
+	\caption{Zoom de la détection}
+	\label{fig:detection_zoom}
+\end{figure}
+
+\subsubsection*{Détermination du premier chiffre du code barre}
+À l'aide de la séquence AB obtenue, nous pouvons ainsi déterminer le premier chiffre du code barre en se référant au tableau \ref{tab:sequence}.
+En l'occurrence, nous obtenons le chiffre \textbf{4} comme premier chiffre. 
+
+\subsubsection*{Vérification de la clef de contrôle}
+Nous obtenons alors pour cette image le code \textbf{4902030187590}, ce qui correspond bien au code barre présent sur l'image (cf Figure \ref{code_barre}).
+De manière générale, il faut tout de même vérifier la validité du code barre. Pour cela, nous suivons l'algorithme de vérification de code barre grâce à la clé de contrôle.
+
+En l'occurrence, le complément à 10 du dernier chiffre du code barre vaut 0, tandis que le chiffre des unités de la somme des chiffres de rang impair et trois fois la somme des chiffres de rang pair vaut 0. 
+Le code barre est donc valide.
+
+\subsection{Unification des algorithmes}
+
+\begin{figure}[H] 
+	\begin{center}
+    \includegraphics[width=0.7\textwidth]{images/Detection/lecture2.png}
+	\includegraphics[width=0.7\textwidth]{images/Detection/lecture.jpg}
+	\caption{Lecture d'un code barre combinant les deux phases}
+	\label{fig:finalres}
+    	\end{center}
+\end{figure}
+En figure \ref{fig:finalres} on observe la sortie obtenue en appliquant l'algorithme de détection qui trace le rayon en vert, utilisé finalement par le programme de lecture.
+\newline En combinant ces programmes, on est en mesure, avec des paramètres adéquats à l'image d'effectuer une lecture correcte en un temps de l'ordre de deux secondes.
+\newpage 
+
+\section{Conclusion}
+
+\section{Bilan de l'organisation}
+
+\subsection{Séance 1}
+
+\begin{table}[H]
+	\centering 
+	\begin{tabular}{c|c|c}
+		& Tâches entreprises& Temps passé\\ \hline
+		Elisa& Prise de connaissance du sujet & 2h\\
+        & + début d'implémentation de la méthode d'Otsu & \\ \hline
+		Alban& Prise de connaissance du sujet & 2h\\
+        & + début implémentation de l'échantillonnage et de la binarisation & \\ \hline
+		Tierno& & \\ \hline
+		David& & 
+	\end{tabular}
+	\caption{Organisation de la séance 1}
+\end{table}
+
+\subsection{Séance 2}
+
+\begin{table}[H]
+	\centering 
+	\begin{tabular}{c|c|c}
+		& Tâches entreprises& Temps passé\\ \hline
+		Elisa& Finition de la méthode d'Otsu & 2h\\ \hline
+		Alban& Complétion de l'échantillonnage et de la binarisation& 2h\\
+        &  début du calcul des limites du code-barres et de la recherche de u & \\ \hline
+		Tierno& & \\ \hline
+		David& & 
+	\end{tabular}
+	\caption{Organisation de la séance 2}
+\end{table}
+
+\subsection{Séance 3}
+
+\begin{table}[H]
+	\centering 
+	\begin{tabular}{c|c|c}
+		& Tâches entreprises& Temps passé\\ \hline
+		Elisa& Débuggage et mise en commun de toutes les fonctions de la phase 1 & 3h\\ \hline
+		Alban& Débuggage et mise en commun de toutes les fonctions de la phase 1& 3h\\ \hline
+		Tierno& & \\ \hline
+		David& & 
+	\end{tabular}
+	\caption{Organisation de la séance 3}
+\end{table}
+
+\subsection{Séance 4}
+
+\begin{table}[H]
+	\centering 
+	\begin{tabular}{c|c|c}
+		& Tâches entreprises& Temps passé\\ \hline
+		Elisa& Dernier débuggage et test sur des exemples pour vérifier l'efficacité du code& 3h\\ \hline
+		Alban& Dernier débuggage et test sur des exemples pour vérifier l'efficacité du code& 3h\\ \hline
+		Tierno& & \\ \hline
+		David& & 
+	\end{tabular}
+	\caption{Organisation de la séance 4}
+\end{table}
+
+\subsection{Séance 5} % 13 Décembre 
+
+\begin{table}[H]
+	\centering 
+	\begin{tabular}{c|c|c}
+		& Tâches entreprises& Temps passé\\ \hline
+		Elisa& Rédaction du rapport & 3h\\ \hline
+		Alban& Rédaction du rapport & 3h\\ \hline
+		Tierno& & \\ \hline
+		David& & 
+	\end{tabular}
+	\caption{Organisation de la séance 5}
+\end{table}
+
+\newpage
+
+\section{Annexes}
+
+\lstset{style=mystyle}
+
+\subsection{Phase 1 : Détection du code barre}
+
+\subsection{Phase 2 : Lecture du code barre}
+\begin{lstlisting}
+def otsu(img, bins=255):
+	luminance = None
+	
+	# Si l'image est en couleur (3 dimensions)
+	if len(img.shape) == 3 and img.shape[2] > 1:
+		# Calcul de la luminance 
+		luminance = np.array([[(img[i][j][0] + img[i][j][1] + img[i][j][2])//3 for j in range(img.shape[1])] for i in range(img.shape[0])])
+		luminance = luminance.ravel()
+	else:
+		luminance = img.ravel()
+	
+	# Création de l'histogramme
+	histogram, bin_edges = np.histogram(luminance.ravel(), range=(0, 255), bins=bins)
+	
+	# Moyenner l'histogramme
+	histogram = histogram/sum(histogram)    
+	
+	# Création d'un dico pour associer chaque valeur de luminance à sa fréquence
+	histogram_dic = {int(bin_edges[i]): histogram[i] for i in range(len(histogram))}
+	
+	# Initialisation des moyennes et poids initiaux
+	n = len(histogram_dic)
+	sumB = 0
+	wB = 0
+	maximum = 0.0
+	sum1 = sum(i * histogram_dic[i] for i in range(n))
+	total = sum(histogram_dic.values())
+	level = 0
+	for k in range(1, n):
+		wF = total - wB
+		if wB > 0 and wF > 0:
+			mF = (sum1 - sumB) / wF
+			val = wB * wF * (sumB / wB - mF) * (sumB / wB - mF)
+			
+			if val >= maximum:
+				level = k
+				maximum = val
+		
+		wB += histogram_dic[k]
+		sumB += (k-1) * histogram_dic[k] # A vérifier si c'est k ou k-1
+	
+	return level
+
+def distance(x1,y1,x2,y2):
+	""" Calcule la distance entre deux points """
+	return np.sqrt((x2-x1)**2+(y2-y1)**2)
+
+def echantillonnage(x1,y1,x2,y2,Nb_points):
+	"""On échantillone sur le segment (x1,y1)->(x2,y2)"""
+	"""On va choisir le plus proche voisin"""
+	X=np.around(np.linspace(np.floor(x1),np.ceil(x2),Nb_points)).astype(int)
+	Y=np.around(np.linspace(np.floor(y1),np.ceil(y2),Nb_points)).astype(int)
+	return X,Y
+
+
+def find_lim(x1,y1,x2,y2,img,seuil):
+    """Récupération des points de départ et d'arrivée pour le segment 2"""
+    X,Y=echantillonnage(x1,y1,x2,y2,np.ceil(distance(x1, y1, x2, y2)).astype(int))
+    valeurs_img=np.zeros((len(X), 1))
+
+    for i in range(0,len(X)):
+        valeurs_img[i]=(img[Y[i], X[i]]) >= seuil
+    i1=0
+    i2=0
+
+    for i in range(0,len(valeurs_img)):
+        if valeurs_img[i]==0:
+            i1=i
+            break
+    for i in range(len(valeurs_img)-1,1,-1):
+        if valeurs_img[i]==0:
+            i2=i
+            break
+    return X[i1],Y[i1],X[i2],Y[i2] # xd,yd,xa,ya
+
+
+def find_u(xd,yd,xa,ya,img,seuil):
+    """On va prendre le multiple u et le signal binaire à analyser"""
+    nb_p=np.ceil(distance(xd,yd,xa,ya)).astype(int) # Nombre de points L'
+    Nb_points=0 # u * 95
+    u=0
+    while (Nb_points<=nb_p): # On cherche le plus petit u tq u * 95 > nb_p
+        Nb_points+=95
+        u+=1
+    
+    X,Y=echantillonnage(xd,yd,xa,ya,Nb_points)
+    valeurs_img=np.zeros((len(X), 1))
+    
+    for i in range(0,len(X)):
+        valeurs_img[i]=(img[Y[i], X[i]]) <= seuil
+    
+
+    return valeurs_img,u #Echantillonnage et binarisation
+
+
+def separate(segment_seuille,u):
+    L=np.zeros((12,u*7))
+    start=3*u # Détermine les "gardes" (offset)
+    for i in range(0,12):
+        if (i==6):
+            start=start+5*u
+        segment_seuille_temp = segment_seuille[start+i*7*u : start+(i+1)*7*u]
+
+        for j in range(len(L[i])):
+            L[i,j] = segment_seuille_temp[j,0]  
+
+    return L
+
+def norme_binaire(liste_binaire,chaine_binaire,u):
+    sum=0
+    for k in range(0,7):
+        for i in range(0,u):
+            sum+=(liste_binaire[k*u+i]!=int(chaine_binaire[k]))
+    return sum
+
+def compare(region_chiffres_bin,L_the,u):
+    normes_codes=len(region_chiffres_bin[0])
+    decode=np.zeros((12))
+    r=""
+    for i in range(0,6):
+        r_b=r
+        for j in range(0,len(L_the[0])):
+            if (normes_codes>=norme_binaire(region_chiffres_bin[i],L_the[0][j],u)):
+                normes_codes=norme_binaire(region_chiffres_bin[i],L_the[0][j],u)
+                decode[i]=int(j)
+                r=r_b+"A"
+            if (normes_codes>=norme_binaire(region_chiffres_bin[i],L_the[1][j],u)):
+                normes_codes=norme_binaire(region_chiffres_bin[i],L_the[1][j],u)
+                decode[i]=int(j)
+                r=r_b+"B"
+        normes_codes=len(region_chiffres_bin[0])
+    for i in range(6,len(region_chiffres_bin)):
+        for j in range(0,len(L_the[0])):
+            if (normes_codes>=norme_binaire(region_chiffres_bin[i],L_the[2][j],u)):
+                normes_codes=norme_binaire(region_chiffres_bin[i],L_the[2][j],u)
+                decode[i]=int(j)
+        normes_codes=len(region_chiffres_bin[0])
+    return decode,r
+
+
+def first_one(decode,r,tab):
+    """ Retourne le premier chiffre """
+    for i in range(0,len(tab)):
+        if (r==tab[i]):
+            return i
+    return None
+
+def clef_controle(decode):
+    # Complément à 10 du dernier chiffre du code barre
+    complement = (10 - decode[-1]) % 10
+
+    L = [1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3]
+    clef = np.sum(decode[0:-1] * L) % 10
+    return clef == complement
+
+def phase1(x, y, img, seuil):
+    starttime = time.perf_counter()
+    x1 = x[0]
+    y1 = y[0]
+    x2 = x[1]
+    y2 = y[1]
+    codage_chiffres_bin = [["0001101", "0011001", "0010011", "0111101", "0100011", "0110001", "0101111", "0111011", "0110111", "0001011"],
+                           ["0100111", "0110011", "0011011", "0100001", "0011101", "0111001", "0000101", "0010001", "0001001", "0010111"],
+                           ["1110010", "1100110", "1101100", "1000010", "1011100", "1001110", "1010000", "1000100", "1001000", "1110100"]]
+    codage_premier_chiffre = ["AAAAAA","AABABB","AABBAB","AABBBA","ABAABB","ABBAAB","ABBBAA","ABABAB","ABABBA","ABBABA"]
+    Nb=np.ceil(distance(x1, y1, x2, y2)).astype(int) # Nombre de points
+    
+    # Binarisation
+    xd,yd,xa,ya = find_lim(x1,y1,x2,y2,img,seuil)
+    
+    # Echantillonage + Binarisation de l'image après seuillage 
+    segment_seuillage, u = find_u(xd,yd,xa,ya,img,seuil)
+    regions_chiffres_bin = separate(segment_seuillage,u)
+    
+    # Décodage des regions binaires
+    regions_chiffres, sequence_AB = compare(regions_chiffres_bin,codage_chiffres_bin,u)
+    
+    # Ajout du premier chiffre
+    premier_chiffre = first_one(regions_chiffres,sequence_AB,codage_premier_chiffre)
+    
+    if (premier_chiffre == None):
+        return None
+    
+    code_barre = np.append(premier_chiffre, regions_chiffres)
+    
+    # Vérification de la clé de contrôle
+    if clef_controle(code_barre):
+        print("Code barre valide : ", code_barre)
+        endtime = time.perf_counter() - starttime
+        print("Temps d'exécution : ", endtime)
+        return code_barre
+    else:
+        print("Code barre invalide : ", code_barre)
+        return None 
+
+\end{lstlisting}
+
+\end{document}
