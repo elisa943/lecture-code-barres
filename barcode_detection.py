@@ -93,6 +93,7 @@ def barcode_detection(img,sigma_g,sigma_t,seuil,sigma_bruit=2,affichage=False):
     #============================================================================================================
     # affichage basique des rayons obtenus
     plt.figure()
+    plt.figure(figsize=(10, 5), dpi=300)
     plt.subplot(1, 2, 1)
     plt.imshow(img_code_barre)
     for blob in Blobs:
@@ -225,7 +226,7 @@ def barcode_detection_2(img,sigma_g,sigma_t,seuil,sigma_bruit=2,affichage=False)
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Labelisation ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     D_labeled,num_labels=measure.label(D_seuil,return_num=True)
     blobs=measure.regionprops(D_labeled)
-    print(f"{num_labels} objects detected in img")
+    print(f"{num_labels} object(s) detected in img")
     coords=[x.coords for x in blobs]
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Extraction de l'axe ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     

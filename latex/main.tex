@@ -12,7 +12,9 @@
 \usepackage{graphicx} % For inserting images
 \usepackage{xcolor} % For link coloring
 \usepackage[hidelinks]{hyperref} % For URL links (no box or color name) 
-
+\usepackage{amsmath}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
 %Ce que moi(Alban) ai rajouté comme package
 \usepackage{comment} 
 \usepackage{multicol} % Pour les colonnes
@@ -64,6 +66,7 @@
 }
 
 \title{TS229}
+\newcommand{\figsize}{1\textwidth}
 \begin{document}
 
 %----------- Informations du rapport ---------
@@ -180,8 +183,32 @@ chiffres en positions impaires jusqu'au $12^{eme}$ chiffre.
 La clé est alors valable si le chiffre des unités est égal au complément à 10 du $13^{eme}$ chiffre du code.
 
 \section{Implémentation}
-
 \subsection{Phase 1 : Détection du code barre}
+\subsubsection*{Image}
+À partir d'une image en couleur RGB, nous la convertissons en YCbCr et ne gardons que le canal de luminance. En effet, un code-barre est une alternance de bandes noires et blanches, donc seul ce contraste d'intensité nous intéresse.
+\newline On ajoute d'ailleurs un bruit blanc gaussien centré de variance $\sigma_{bruit}^2$ dès le chargement de l'image. Cela améliore la capacité de détection.
+
+\subsubsection*{Mesure de cohérence}
+\label{sec:coherence}
+Pour le calcul de la mesure de cohérence, nous devons tout d'abord calculer les vecteurs gradients d'intensité. Pour cela, nous les calculons au moyen des filtres de Canny, ce qui correspond à appliquer un filtre convolutif gaussien avec un écart type $\sigma_g$. Cet écart type doit être relativement faible pour trouver les vecteurs de transition correspondant aux barres blanches et noires.
+
+Ensuite, nous calculons la fonction de pondération du voisinage à l'aide d'un filtre passe-bas gaussien, avec un écart type $\sigma_t$. Cet écart type doit être proportionnel à la taille du code-barre par rapport à la taille de l'image pour trouver des clusters de vecteurs gradient d'intensité.
+
+\subsubsection*{Labélisation}
+La labélisation des objets détectés dans l'image binaire est réalisée à l'aide de la fonction \texttt{measure.label} de la bibliothèque \texttt{skimage}. Cette fonction attribue un label unique à chaque blob extrait par le biais des étapes précédentes, permettant ainsi de les distinguer et de les analyser individuellement. À l'aide de celle-ci, nous obtenons une image labélisée accompagnée du nombre total d'objets détectés. Finalement, on obtient le nuage de points correspondant à toutes les régions potentiellement intéressantes qui ont été détectées.
+
+De plus, pour éviter d'avoir des zones d'intérêt parasites, on rajoute sur l'image d'origine, avant le traitement d'image, un bruit blanc gaussien pour réduire la qualité de l'image. En effet, ce bruit va perturber les zones de faux positifs sans trop perturber le code-barre puisque sa structure est très contrastée.
+
+\subsubsection*{Classe Blob}
+Une fois les différentes régions extraites de l'image, il nous fallait être en capacité de tracer des rayons pour la lecture. C'est dans cet esprit que nous avons implémenté une classe \textit{Blob}. Celle-ci fournit une interface qui permet à l'utilisateur d'obtenir toutes les données utiles relatives à un blob sans qu'il ait à se soucier de l'implémentation. Ceci nous permet de produire un code plus synthétique et de fluidifier l'échange entre les deux équipes de projet.
+\newline \newline Une instance de \textit{Blob} contient une batterie d'attributs nécessaires au calcul des éléments essentiels pour le tracé : on peut citer le barycentre, la matrice de covariance, ses valeurs et vecteurs propres, etc. Ces attributs sont accompagnés de méthodes qui implémentent plusieurs approches pour le tracé d'un rayon sur un blob donné. On peut par exemple tracer des rayons aléatoires qui passent par le barycentre du blob, ou un rayon de taille adéquate aligné sur l'axe du code-barre tout en étant capable d'ajuster sa longueur pour tenir compte de la déformation induite par le processus d'extraction des zones d'intérêt.
+\newline \newline On peut aussi, à travers cette interface, aisément ajouter des méthodes de calcul qui permettraient d'affiner la détection : par exemple, pour utiliser d'autres approches pour le calcul du rayon, ou l'ajout de filtres sur la forme du blob pour quantifier une probabilité qu'il soit ou non un code-barre. Elle présente aussi l'avantage d'être simple d'utilisation : l'utilisateur fournit la taille d'une image et un nuage de points en son sein en entrée, et peut ensuite directement obtenir les données qui lui sont utiles.
+
+\subsubsection*{Complexité temporelle}
+Nous nous sommes efforcés de produire un code relativement efficace en termes de complexité temporelle.\newline
+Initialement, celui-ci se terminait en une trentaine de secondes. 
+Nous avons utilisé, dès que possible, des calculs matriciels plutôt que des boucles imbriquées, et fait un usage extensif des fonctionnalités de \textit{numpy}, qui fournit des fonctions efficaces pour les calculs d'algèbre linéaire. Le changement le plus impactant a été l'ajout de la fonction \textit{fftconvolve} de \textit{scipy}, qui tire parti de l'algorithme de la Transformée de Fourier Rapide pour effectuer des convolutions en un temps record.
+\newline Ces améliorations nous ont permis d'atteindre une exécution de l'ordre d'une seconde.
 
 \subsection{Phase 2 : Lecture du code barre}
 
@@ -216,6 +243,63 @@ Les fonctions implémentées sont :
 \section{Résultats}
 
 \subsection{Phase 1 : Détection du code barre}
+
+\begin{figure}[H] 
+	\centering
+	\includegraphics[width=\figsize]{images/Detection/Y.png}
+	\caption{Image originale et canal de Luminance}
+	\label{Y}
+\end{figure}
+Nous convertissons l'image couleur RGB en image canal Y pour ne garder que l'intensité du contraste. Cela nous permet de bien distinguer les bandes noires et blanches.
+\begin{figure}[H] 
+	\centering
+	\includegraphics[width=\figsize]{images/Detection/gradients.png}
+	\caption{Gradients en X et en Y}
+	\label{grad}
+\end{figure}
+A partir du canal de luminance, nous calculons le vecteur gradient selon x et selon y. Pour vérifier qu'il s'agit du gradient selon, nous observons dans l'image à gauche, que l'on observe bien la variation horizontale d'intensité à la coordonnée (1200,1000), on donc bien un gradient selon x. Et pour l'image de droite, nous observons une variation verticale au coordonnée (0,750), donc on a un gradient selon y.
+\begin{figure}[H] 
+	\centering
+	\includegraphics[width=\figsize]{images/Detection/normalisation.png}
+	\caption{Normalisation des gradients}
+	\label{norm}
+\end{figure}
+La normalisation permet d'appuyer les transitions de pixel pour faciliter la détection des codes barres et permet d'avoir un tenseur de structure local bien contrasté. 
+\begin{figure}[H] 
+	\centering
+	\includegraphics[width=\figsize]{images/Detection/tenseur.png}
+	\caption{Visualisation des composantes du tenseur de structure local}
+	\label{tenseur}
+\end{figure}
+En observant le tenseur Txy, on peut observer la zone du code barre très contrasté par rapport au reste de l'image.
+
+\begin{figure}[H]  
+	\centering
+	\includegraphics[width=\figsize]{images/Detection/mesure_coherence_seuil.png}
+	\caption{Mesure de cohérence et seuillage }
+	\label{seuil}
+\end{figure}
+La mesure de cohérence seuillée met en évidence une région d'interet, qui correspond à la zone où le code barre se situe. Nous effectuons un seuillage pour mettre en évidence la zone d'interêt et ainsi faciliter la labélisation.
+\begin{figure}[H]  
+	\centering
+	\includegraphics[width=\figsize]{images/Detection/img_labeled.png}
+	\caption{Labélisation et tracé de rayon}
+	\label{seuil}
+\end{figure}
+En choisissant des paramètres adéquats:
+%$\sigma_g=2$,$\sigma_t=50$,$seuil=0.7$, $sigma_{bruit}=2$
+$$\sigma_g = 2, \quad \sigma_t = 50, \quad \text{seuil} = 0.7, \quad \sigma_{\text{bruit}} = 2$$
+On est obtient un tracé de rayon pertinent.
+\newline Ces paramètres sont différents pour chaque image et doivent respecter les conditions citées en \ref{sec:coherence}
+\begin{figure}[H]  
+	\centering
+	\includegraphics[width=\figsize]{images/Detection/manyblobs.png}
+	\caption{Labélisation et tracé de rayon}
+	\label{seuil}
+\end{figure}
+Si les paramètres de détection ne sont pas bien choisis, des régions parasites font surface. Ici:
+%$\sigma_g=2$,$\sigma_t=50$,$seuil=0.7$, $sigma_{bruit}=2$
+$$\sigma_g = 5, \quad \sigma_t = 30, \quad \text{seuil} = 0.7, \quad \sigma_{\text{bruit}} = 2$$
 
 \subsection{Phase 2 : Lecture du code barre}
 
@@ -308,7 +392,18 @@ De manière générale, il faut tout de même vérifier la validité du code bar
 En l'occurrence, le complément à 10 du dernier chiffre du code barre vaut 0, tandis que le chiffre des unités de la somme des chiffres de rang impair et trois fois la somme des chiffres de rang pair vaut 0. 
 Le code barre est donc valide.
 
+\subsection{Unification des algorithmes}
 
+\begin{figure}[H] 
+	\begin{center}
+    \includegraphics[width=0.7\textwidth]{images/Detection/lecture2.png}
+	\includegraphics[width=0.7\textwidth]{images/Detection/lecture.jpg}
+	\caption{Lecture d'un code barre combinant les deux phases}
+	\label{fig:finalres}
+    	\end{center}
+\end{figure}
+En figure \ref{fig:finalres} on observe la sortie obtenue en appliquant l'algorithme de détection qui trace le rayon en vert, utilisé finalement par le programme de lecture.
+\newline En combinant ces programmes, on est en mesure, avec des paramètres adéquats à l'image d'effectuer une lecture correcte en un temps de l'ordre de deux secondes.
 \newpage 
 
 \section{Conclusion}
