@@ -231,7 +231,7 @@ def barcode_detection_2(img,sigma_g,sigma_t,seuil,sigma_bruit=2,affichage=False)
     
     # En utilisant la méthode vectorielle
     Blobs=[Blob(pixels=x.coords,imsize=[h,w]) for x in blobs]
-    axis=[b.calc_axis_ray(6) for b in Blobs]
+    # axis=[b.calc_axis_ray(6) for b in Blobs]
     
     # Methode des points extrêmes
     # Blobs=[Blob(pixels=x.coords,imsize=[h,w]) for x in blobs]

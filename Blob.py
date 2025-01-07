@@ -80,7 +80,7 @@ class Blob:
                 self.axis=[p1,p2]
         return self.axis
     
-    def calc_axis_ray(self,len_adjust=1):
+    def calc_axis_ray(self,len_adjust=6):
         # len adjust: facteur d'ajustement pour la longueur finale de l'axe. initialement à 1.
         self.calc_all()
         if self.valeurs_propres[0]>self.valeurs_propres[1]: #on détecte la valeur propre la plus grande
