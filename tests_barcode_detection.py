@@ -18,7 +18,7 @@ sigma_g = 2
 sigma_t = 100
 
 seuil = 0.7 
-# u=barcode_detection(img,sigma_g,sigma_t,seuil=0.5,sigma_bruit=2)
+u=barcode_detection(img,sigma_g,sigma_t,seuil=0.5,sigma_bruit=2)
 # u=barcode_detection("img/code_barre_prof.jpg",1,15,0.7,2,affichage=False)
 # u=barcode_detection("img/barcode0.jpg",sigma_g=2,sigma_t=50,seuil=0.7,sigma_bruit=2)
 # u=barcode_detection("img/b1.jpg",2,50,0.7,2,affichage=False)

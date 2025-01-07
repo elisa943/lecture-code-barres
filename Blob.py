@@ -18,8 +18,9 @@ class Blob:
         self.barycentre = None
         self.valeurs_propres = None
         self.vecteurs_propres = None
-        self.area = None
         self.axis = None
+        # Pour d'éventuelles applications futures
+        self.area = None
         self.longueur = None
     def calc_XY(self):
         self.X,self.Y=self.pixels[:,0],self.pixels[:,1]
@@ -101,7 +102,7 @@ class Blob:
     #pour la représentation des Blobs
     def __repr__(self):
         plt.figure()
-        p1,p2 = self.calc_axis()
+        p1,p2 = self.calc_axis_ray()
         plt.imshow(self.pixels)
         k=2
         h=floor((max(self.Y)+1-min(self.Y))*k)
